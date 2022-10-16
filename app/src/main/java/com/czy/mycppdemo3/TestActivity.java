@@ -11,4 +11,11 @@ public class TestActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
     }
+
+    /**
+     * 测试方法
+     */
+    private void test() {
+
+    }
 }
