@@ -7,22 +7,18 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="点击验证java调用c的方法"
-        android:id="@+id/btnTest"/>
+        android:onClick="style1"
+        android:text="style1"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="验证2个数相加"
-        android:id="@+id/btnAdd"
-        />
+        android:onClick="style2"
+        android:text="style2"/>
 
-    <Button
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="验证2个数相乘"
-        android:id="@+id/btnMul"
-        />
-
+        android:id="@+id/iv_mtxx"/>
 
 </LinearLayout>

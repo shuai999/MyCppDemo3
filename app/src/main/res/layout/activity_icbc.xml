@@ -4,25 +4,24 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <Button
-        android:layout_width="wrap_content"
+    <EditText
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="点击验证java调用c的方法"
-        android:id="@+id/btnTest"/>
+        android:hint="请输入用户名"
+        android:id="@+id/et_name"
+        />
 
-    <Button
-        android:layout_width="wrap_content"
+    <EditText
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="验证2个数相加"
-        android:id="@+id/btnAdd"
+        android:hint="请输入密码"
+        android:id="@+id/et_password"
         />
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="验证2个数相乘"
-        android:id="@+id/btnMul"
+        android:text="登录"
+        android:id="@+id/login"
         />
-
-
 </LinearLayout>
