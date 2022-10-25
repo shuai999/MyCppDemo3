@@ -1,13 +1,19 @@
 #include <jni.h> // 把jni.h头文件 导入进来后， 就可以用 jni.h 中所有的变量、方法
 #include <string.h> // strlen()获取 c的字符串长度 , 在 这个头文件里边
 #include <stdlib.h>
+#include <stdio.h>
 
+// c语言 打印日志， 需要添加如下， 同时给
+#include <android/log.h>
+#define LOG_TAG "System.out"
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 
 /**
 * 在这里 实现我们需要的功能：
     1. 拷贝 jni.h 到 jni目录
     2. 把在 Dev c++中写好的功能拷贝到这里
-    3. 写 jni规范
+    3. 把 jni规范 从.h文件拷贝过来。 写功能，这个jni方法 ， 就是  java调用c
 */
 
 // 这里必须把 C的代码拷贝过来， 开发中，这里就是C开发工程师写好，自己光写下边的jni规范
@@ -326,6 +332,7 @@ char* java2CString(JNIEnv *env, jobject obj, jstring str){
     // 4. 调用  方法.对象（正常是：对象.方法） 下边的 jobject就是 指针
     // jobject  (*CallObjectMethod)(JNIEnv*, jobject, jmethodID, ...);
     jstring jstr = (*env)->NewStringUTF(env, "utf-8");
+    // 把字符串 先 转为 字节数组
     jbyteArray jba  = (*env)->CallObjectMethod(env, str, method, jstr);
 
     // 5. 获取到数组array
@@ -372,3 +379,94 @@ jstring Java_com_czy_mycppdemo3_Java2CActivity_getHelloFromC
     jstring jstr = (*env)->NewStringUTF(env, result);
     return jstr;
 }
+
+// java 调用c， 获取压力值  JNIEXPORT和JNICALL可以删除
+JNIEXPORT jint JNICALL Java_com_czy_mycppdemo3_guolu_GuoluActivity_getPressValue
+  (JNIEnv *env, jobject jobj) {
+
+        // 把 DEV c++ 写的 功能 cstr.c文件拷贝到 jni目录，这里直接调用 cstr.c文件中方法就行
+        return getRandNumber();
+  }
+
+
+int state;  //0是false；  其余都是true
+
+// 开始监控 ：  c语言开始监控  ： 需求：每隔一秒，给我返回一次压力值，死循环
+JNIEXPORT void JNICALL Java_com_czy_mycppdemo3_guolu_GuoluActivity2_startMonitor
+  (JNIEnv *env, jobject jobj) {
+        state = 1; // 开始监控
+        while(state) {
+            // 1. c中 获取到锅炉的压力值
+            int press = getRandNumber();
+
+            // 2. c调用 java， 调用 setMyProgress显示 当前压力值
+            // A: 获取 Class
+            jclass clazz = (*env)->FindClass(env, "com/czy/mycppdemo3/guolu/GuoluActivity2");
+            // B: 获取方法 method  参数3：方法名； 参数4：参数是int，返回值是void
+            jmethodID methodId = (*env)->GetMethodID(env, clazz, "setMyProgress", "(I)V");
+            // C：创建obj，上边参数的 obj
+            // D. 调用  方法.对象（正常是：对象.方法）
+            // jobject  (*CallObjectMethod)(JNIEnv*, jobject, jmethodID, ...);
+            (*env)->CallVoidMethod(env, obj, methodId, press);
+
+            // 每隔1秒返回一个压力值
+            sleep(1);
+        }
+  }
+
+// 停止监控  让上边的 死循环停止
+JNIEXPORT void JNICALL Java_com_czy_mycppdemo3_guolu_GuoluActivity2_stopMonitor
+  (JNIEnv *env, jobject jobj){
+        state = 0;  // 就停止监控
+  }
+
+    // ------------- 第一版
+  // 杀不死方法 —— 让软件卸载不了
+  //JNIEXPORT void JNICALL Java_com_czy_mycppdemo3_xiezai_XieZaiActivity_shabusi
+    //(JNIEnv *env, jobject jobj) {
+
+      //  // 分叉函数  0表示成功
+       // int result = fork();
+        //if(result == 0) {
+            // 分叉成功
+          //  while(1) {
+          //  LOGI("===== 你卸载不掉。。。。=====");
+                // 每隔一秒钟，循环一次
+            //    sleep(1);
+            //}
+        //}
+   // }
+
+
+    // -- 第二版 -- 用户卸载apk后，让跳转一个 qq网页，然后让用户输入为啥卸载原因，然后提交
+    JNIEXPORT void JNICALL Java_com_itheima_removelistener_MainActivity_shabusi
+      (JNIEnv *env, jobject obj)
+    {
+    	//fork();  获取进程 拆分进程
+    		int flag = 1;
+    		pid_t pid = fork(); //拆分进程  pid_t：还是int类型
+    		if (pid == 0) { //0拆分成功
+    			while(flag) {
+    				//监视文件夹是否存在。
+    				//FILE *fopen(char *filename, char *type); 打开文件， rw: 打开文件的模式
+    				FILE* f = fopen("/data/data/com.czy.mycppdemo3.xiezai","rw");
+    				if(f==NULL) {
+    					//文件不存在
+    					LOGI("not exist,bei xiele");
+    					//调用c代码执行一个外部命令，开启界面
+    					// am: ActivityManager： activity管理者
+    					// 卸载完apk后， 用 am strart -a android.intent.action.VIEW -d http://www.qq.com，
+    					// 用 上边的网址 跳转到 qq页面，让用户填写卸载的原因。
+    					// 下边的网址，一般就是写自己服务器的地址，跳转到自己服务器地址
+    					execlp("am", "am", "start", "-a", "android.intent.action.VIEW",
+    							"-d", "http://www.qq.com", NULL);
+    					// 停止打印，停止循环
+    					flag = 0;
+    				} else {
+    					//文件存在
+    					LOGI("exist");
+    				}
+    				sleep(1);
+    			}
+    		}
+    }
