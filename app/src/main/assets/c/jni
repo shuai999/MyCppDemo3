@@ -1,0 +1,4543 @@
+
+3.Jni
+1. Jni是什么
+Jni就是 2个 不同编程语言的 通信
+（1）：Java代码特点
+跨平台，一次编写，到处运行
+Java源代码（自己写的代码） -- 编译后生成 .class文件  --- JVM虚拟机把.class翻译成 操作系统能识别的 代码  ， 操作系统最终执行的就是 机器码、01代码
+
+举例： 在 cmd 中， 命令执行 Hello.java  文件。
+调用 javac Hello.java 编译， 就会生成 Hello.class 文件， 这个就是 class文件。
+
+
+（2）：C、C++特点：
+没有跨平台
+源代码（自己写的代码） 编译后 --  直接生成 对应操作系统 的 01代码
+Android 是基于 Linux系统的。
+
+Java中国人    C、C++是日本人
+Java 骂  C、C++， 听不懂，需要翻译， 这个翻译就是  Jni
+
+java 发指令给 Jni， Jni把 指令给 C、C++；
+C、C++把 结果返回给Jni， Jni在把结果给 java
+
+Java和 C， 不能直接通信。 用 Jni 把 java 翻译，然后给C，C把结果回给 Jni， Jni 再把结果 回给 java
+
+
+2、为什么用Jni
+（1）：jni开发挣钱
+（2）：物联网： 物体联网。  比如刘德华要吃猪，给猪身上安装一个芯片，通过操作芯片，用手机随时都能知道，  猪在干啥。 用jni开发。
+（3）：特殊的设备：
+机顶盒：手机控制电视，手机当遥控器用控制电视， 用的 jni 技术。
+人脸识别：都是C写的，java 不能直接操作底层硬件。  不能直接调用C，  需要通过 jni， 来实现 java想要实现的功能。
+（4）：性能高： C的性能 比 java 要快很多。
+（5）： 老板的要求： java 的反编译 很容易。 C的 反编译 很难，即使反编译了，也看不懂。 比如支付宝手机客户端 用C写 加密解密的。
+
+3、怎么使用jni
+要 java基础、C/C++基础
+4、C调用 java：
+在文件夹中定义 callJava.c文件：
+#include <stdio.h> // 相当于 java 中的 import java.util.ArrayList
+#include <stdlib.h>  //   stdio 输入输出头文件，  stdlib 标准函数库
+
+main(){ // 相当于 public static void main(String[] args)
+    printf("c Hello World !\n"); // 相当于 System.out.print();  \n表示换行
+
+    // printf("java Hello !\n");
+    system("mspaint");
+    system("pause");  // 相当于 直接调用 doc的 命令
+}
+
+上边编译、运行后结果是：
+输出 java Hello
+同时 直接打开 画画板
+
+
+
+其实编译运行后，在 文件夹中 会生成  callJava.exe文件，直接点击 即可，就会有上边的打印结果：
+先打印 c Hello World，然后打开画画板。
+
+5.  C的基本数据类型
+Java8种类型：
+byte：1byte字节
+short：2byte字节
+int：4byte字节
+long：8byte字节
+float：4byte字节
+double: 8byte字节
+char：2byte 字节
+boolean:
+1byte = 8位
+
+C 数据类型
+
+
+十进制是 156
+
+等同于 二进制：
+
+
+1 0 0 1 1 1 0 0 ： 第一位表示符号位，1表示负数。
+后边的取反， 11 000 11，再加1
+
+对应的 十进制：
+
+再加1， 是100 ，  第一个是1表示负数， 就是 -100.
+
+
+
+6.  C的输出函数
+      %d： int 【打印int类型】
+      %ld： long int 【打印 长整型】
+      %hd：  短整型  half int 整型的一半
+
+      %f：  float 【float类型】
+      %lf：  长的浮点数， 就是double
+
+      %u：  无符号数
+
+      %x：   十六进制输出
+      %o：  八进制输出
+
+      %c：  char 【字符类型】
+      %s：   字符串
+
+main(){
+    int d = 33;
+    float f = 23.3;
+    // 输出语句的凡是遇到%， 都会用后边的数值来替换。
+    printf("d=%d, f=%f\n", d, f);  // d=33, f=23.2999999
+    printf("d=%d, f=%.1f\n", d, f);  // 小数点后边1位，后边的四舍五入。 d=33, f=23.3
+
+    // 定义字符串 2种方式
+    char str[] = "andy"; //{'a', 'n', 'd', 'y', '\0'};     以\0结尾
+    printf("str=%s\n", str);   // str=andy
+    system("pause");  // 相当于 直接调用 doc的 命令
+}
+7.  C的输入函数
+main(){
+     printf("学生输入信息：\n");
+     int sid;
+     int age;
+     char name[10];
+
+     printf("学号：");
+     scanf("%d", &sid);  // &sid：表示地址 ,地址就是指针，指针就是地址
+     printf("年龄：");
+     scanf("%d", &age);
+     printf("姓名：");
+     scanf("%s", &name);
+
+     printf("学号：%d, 年龄：%d, 名字：%s\n", sid, age, name);
+
+    system("pause");  // 相当于 直接调用 doc的 命令
+}
+
+8.  打印地址值
+指针就是地址，地址就是指针。   找到内存的地址， 然后修改地址对应的值
+C语言就是 操作 内存中的地址
+
+#include <stdio.h> // 相当于 java 中的 import java.util.ArrayList
+#include <stdlib.h>  //   stdio 输入输出头文件，  stdlib 标准函数库
+
+main(){ // 相当于 public static void main(String[] args)
+    printf("爆炸剩余时间\n");
+    int time = 100;
+    printf("time的地址：%#x\n", &time);  // #x 打头的是 16进制数， 0x打头是 8进制数
+
+    for(; time>0; time--){
+      printf("爆炸倒计时: %d\n", time);
+
+      // 睡眠2s   ----------->   相当于 java中的 Thread.sleep
+      sleep(2000);
+    }
+
+    system("pause");
+}
+
+
+9.  *在C语言的的3种用法
+1. 2个数相乘     a*b
+2. 声明指针变量  ： 数据类型*  变量名;
+3. 取指针的值（取指针的值）  *变量名
+
+
+内存结构图：
+
+
+10. 交换2个数据位置
+（1）：传递 int类型
+
+
+栈内存： 压栈
+
+
+
+
+1.main方法入栈， 然后定义 2个变量， n1 和 n2. n1赋值为3， n2赋值为 5.
+2.change(int a, int b)方法入栈，把 n1赋值给a， 此时 a=3；  把n2赋值给b，b=5， 然后方法内部又定义 temp, 就是上边的 c。
+  int temp = 3, a = 5, b = 3。  change方法执行完成后出栈；
+3.执行 printf语句。  此时 change方法出栈后， 栈内 n1=3， n2=5。
+没有交换顺序
+（2）：传递地址，给指针变量
+
+可以交换
+
+
+
+
+（1）：把n1的地址 赋值给 pa指针变量， pa = 0x0000000011，  pa自身地址0xaaaaaaaa;
+ n2的地址 赋值给 pb 指针变量，pb = 0x00000015，pb自身变量 0xbbbbbbbb；
+（2）：定义 int temp 变量， 地址是 0xccccccc
+（3）：int temp = *pa， 表示把pa的值给 temp， pa的地址是 0x000000011, 这个地址对应的值是 3 。 所以 temp = 3；
+*pa = *pb：表示 把 *pb的值 给 pa， pb的地址是 0xbbbbbbbb，这个地址对应的值是 5， 所以 pa = 5， n1 =5；
+*pb = temp， pb = 3， n2 = 3 。
+
+所以： n1 = 5,  n2 = 3 。
+
+（3）：Java的2个数据交换位置
+
+
+
+
+
+11. 指针概念
+
+
+1.int* p = NULL:   // 指针要赋值， 不赋值 就是 野指针
+2.if（p == NULL）：相当于 java 中的 p == null 判断
+3.sizeof(p)：  就是 p的长度
+4. int* pa = &a 、 float* pb = &b。
+ int类型指针 pa  只能指向 int的地址 &a；
+float类型指针pb 只能指向 float的地址 &b
+
+5.*pa、*pb ,   表示 取的是 值 3、4.4
+12. C中的for循环和while循环
+#include <stdio.h>
+#include <stdlib.h>
+main() {
+       // C语言的 for循环  for循环 等同于 下边的 while循环。
+       // int i = 0;
+       for(; i < 5 ; i++){
+      }
+
+      while(i < 5) {
+         i++;
+      }
+}
+13. 要获取px和py的值， 就需要传递地址
+#include <stdio.h>
+#include <stdlib.h>
+
+void getxy(int* px, int* py) {
+     *px = 200;
+     *py = 250;
+}
+
+main() {
+
+    int x, y;
+    // 要获取px和py的值， 就需要传递地址
+    getxy(&x, &y);
+    printf("x=%d, x=%d\n",x, y);     // x=200, y=250
+    system("pause");
+}
+
+14. C的逻辑
+true：非0     false：0
+15. 堆内存
+int* p1 = malloc(4)： 申请内存空间，
+free(p1)： 释放内存空间
+
+#include <stdio.h>
+#include <stdlib.h>
+
+void changec(int** ptemp){
+     // malloc(4)： 申请的地址，在堆内存 ，通过free释放空间。  C是手动垃圾回收，不回收就一直在内存中存在。
+     int* p1 = malloc(4);  // 动态申请内存，相当于java中的  new Person() 对象， int是4个字节，把int字节的地址传递给p1
+     *p1 = 3;
+     int* pa = p1;
+     *ptemp = pa;
+     printf("&a=%#x\n",pa);
+
+}
+
+
+
+// 函数执行完 出栈
+// 传递指针
+// 不管C还是java，  方法不能修改实际的值
+void change(int* ptemp) {// 形式参数
+     int a = 3;
+     int* pa = &a; // 类型是指针 变量是pa = &地址
+
+     ptemp = pa;
+     printf("&a=%#x\n",pa); //&a=0x28ff14
+
+}
+
+main(){
+  int* pnum=0;
+  changed(&pnum);
+  printf("*pnum=%d, pnum=%#x\n", *pnum, pnum);
+  system("pause");
+}
+
+
+
+
+（1）：栈中，pnum入栈， 赋值0， 地址是 0x0011；
+（2）：changec方法入参。 申请p1地址 0xffaa11。 用 malloc(4) 申请地址，在堆内存中。 用 free(p1) 释放空间。
+（3）：把 3 赋给 p1；
+（4）：把p1的地址 赋给 pa，pa也是 0xffaa11;
+（5）：ptemp是二级指针，是接收 一级指针的。 *ptemp就是 接收传递过来的  pnum的地址  0x0011.
+16. 获取指针的值
+有几个*号，就用几个 *来获取值
+#include <stdio.h>
+#include <stdlib.h>
+
+main(){
+   int i = 5;
+   int* p1 = &i;  // i的地址
+
+   int** p2 = &p1;  // 获取p1的地址
+
+   // int*** p3， 想要p3的值， 就用 ***p3，  就是 有几个指针，就用几个指针获取值。
+   printf("i=%d, p1=%d, p2=%d\n", i, *p1, **p2);
+
+   system("pause");
+}
+17. C数组
+（1）：多级指针：
+#include <stdio.h>
+#include <stdlib.h>
+
+main(){
+   int i = 5;
+   int* p1 = &i;  // i的地址
+   int** p2 = &p1;  // 获取p1的地址
+   // int*** p3，  想要p3的值，就用 ***p3，  就是 有几个指针，就用几个指针获取值。
+   printf("i=%d, p1=%d, p2=%d\n", i, *p1, **p2);
+   system("pause");
+}
+（2）：定义数组，打印int数组字节数
+#include <stdio.h>
+#include <stdlib.h>
+
+main(){
+   int datas[5]; // 相当于 int datas[] = new int[5]
+
+// 20， int是4个字节， 5个int是20
+   printf("datas size:%d\n", sizeof(datas));
+   system("pause");
+}
+（3）：遍历 int数组 并打印
+C不会数组越界，没有界限限制。 超过界限照样可以打印值。下边的 arr[5]
+#include <stdio.h>
+#include <stdlib.h>
+
+// 遍历 int数组
+void setDatas(int arr[], int len){
+     int i=0;
+     for(; i<len; i++){
+        arr[i] = i +1;
+     }
+}
+
+// 打印 int数组
+void printDatas(int arr[], int len){
+     int i=0;
+     for(; i<len; i++){
+         // arr[0] = 1; arr[1] = 2,  arr[2] = 3; arr[3] = 4 arr[4] = 5;
+         printf("arr[%d] = %d\n", i, arr[i]);
+     }
+}
+
+
+main(){
+   int datas[5]; // 相当于 int datas[] = new int[5]
+
+
+   // C 中， 数组不会越界，会继续打印。
+ datas[5] = 33;
+
+
+   setDatas(datas, 5);
+   printDatas(datas, 5);
+   printf("datas size:%d\n", sizeof(datas));    // 20， int是4个字节， 5个int是20
+   system("pause");
+}
+（4）：字符串数组
+（4）：通过地址和指针的方式取值，二者是一样的。
+A：通过地址方式 取值：
+// 打印 int数组  arr[]是形式参数 ===》 等价于 int *arr
+void printDatas(int arr[], int len){
+     // arr size:4
+     printf("arr size:%d\n", sizeof(arr));
+
+     int i=0;
+     for(; i<len; i++){
+          // int类型占4个字节， 地址相差4， 内存是连续的
+         // arr[0] = 1, &arr[0]=0x28ff20
+         // arr[1] = 2, &arr[1]=0x28ff24
+         // arr[2] = 3, &arr[2]=0x28ff28
+         // arr[3] = 4, &arr[3]=0x28ff2c
+         // arr[4] = 5, &arr[4]=0x28ff30
+         // arr[5] = 33, &arr[5]=0x28ff34
+         // 这里是 4个 占位符d
+         printf("arr[%d] = %d, &arr[%d]=%#x\n", i, arr[i], i, &arr[i]);
+     }
+}
+
+
+main(){
+
+    // 数组名datas： 表示数组第一个元素 地址（指针）的常量
+   int datas[5]; // 相当于 int datas[] = new int[5]
+
+   // C 中， 数组不会越界，会继续打印。
+   datas[5] = 33;
+
+   // datas size:20
+   printf("datas size:%d\n", sizeof(datas));    // 20， int是4个字节， 5个int是20
+
+    // datas length:5
+   printf("datas length:%d\n", sizeof(datas)/sizeof(datas[0])); // 5
+   system("pause");
+}
+B：通过指针方式取值：
+// 用指针方式打印  和 上边的地址方式打印 一样。
+void printp(int* arr, int len){
+     printf("arr size: %d\n", sizeof(arr));
+
+     // 如果arr是数组， *(arr + i) ===》 等价于 arr[i]
+    // 对指针变量+1， 是以指针类型为单位。
+    // 如：int类型指针 int*  +1 表示4byte个字节  short* +1 表示2byte个字节
+     int i=0;
+     for(; i<len; i++){
+       printf("arr[%d] = %d, &arr[%d] = %#x\n", i, *(arr + i), i, &arr[i]);
+     }
+}
+（5）：short类型的指针
+#include <stdio.h>
+#include <stdlib.h>
+
+main(){
+
+   // short类型数组 ， 5个单元
+   short datas[5]; // 数组名datas  等价于 第一个元素的地址 &data[0]
+
+   // short类型指针 , 把第一个元素的地址  给 p指针
+   short* p = datas;
+
+   int i=0;
+   for(; i<5; i++){
+      // 打印数组中每个元素的 地址    short占2个字节。 每个间隔2.
+      // &p[0]=0x28ff30
+      // &p[1]=0x28ff32
+      // &p[2]=0x28ff34
+      // &p[3]=0x28ff36
+      // &p[4]=0x28ff38
+
+      // 用地址打印 地址
+      printf("&p[%d]=%#x\n", i, &p[i]);
+
+      // 用指针打印 地址   二者打印结果一样。   这里是short* 类型，所以 i 就是 2；  如果是 int*， i 就是 4.
+      printf("&p[%d]=%#x\n", i, p + i);   // *(p+i) 等价于  p[i]，  所以 &*(p+i) 等价于 &p[i]
+
+   }
+   system("pause");
+}
+（6）：指针变量做 +1、-1操作 总结
+A：看指针数据类型 ，比如int*，就是 4个字节；  short* 就是 2个字节，如上边示例。
+B：仅限于 数组类型
+（7）：数组的大小 和 指针的大小
+数组datas的大小 sizeof(datas)： 都是 10
+指针的大小
+main(){
+
+   // short类型数组 ， 5个单元
+   short datas[5];  // 数组名datas  等价于 第一个元素的地址 &data[0]
+   printf("datas length: %d\n", sizeof(datas)); //5*2=10  数组的大小是10
+
+   // short类型指针 , 把第一个元素的地址  给 p指针
+   short* p = datas;
+   printf("datas length: %d\n", sizeof(p)); // 所有类型指针的大小 都是 4.
+
+   system("pause");
+}
+（8）：在形式参数中，arr[]数组、 *arr一样，大小都是4
+#include <stdio.h>
+#include <stdlib.h>
+
+void initDatas(short *a){ // 这里的 a[] 和 *a 是一样的。都是 4.
+     printf("a size : %d\n", sizeof(a)); // 4
+}
+
+main() {
+   // short类型数组 ， 5个单元
+   short datas[5]; // 数组名datas  等价于 第一个元素的地址 &data[0]
+
+   initDatas(datas);
+   system("pause");
+}
+18. C字符串
+（1）：字符串定义2种方式：
+方式1： char str[] = "helloworld";  // 方式1、2都是 只读的
+方式2：char* str = "helloworld";
+
+方式3：char *str = malloc(len + 1)  // 动态申请空间，定义字符串。
+
+一般都用方式3，  方式1、2都是只读的，不能修改字符串；  3是可以修改字符串的，所以一般都动态申请字符串。
+（2）：字符串长度
+A：字符串方式1： char str[10] = "helloworld"
+#include <stdio.h>
+#include <stdlib.h>
+
+main(){
+
+     // 字符串长度是 10   字符串结束符 ： \0
+     char str[] = "helloworld";
+
+     // 数组长度：11 = helloworld\0,  字符串长度：10
+     printf("数组长度：%d, 字符串长度：%d\n", sizeof(str), strlen(str));
+     system("pause");
+}
+B：字符串方式2： char str[12] = "hello\0world";
+#include <stdio.h>
+#include <stdlib.h>
+
+main(){
+     // 字符串长度是 12   字符串结束符 ： \0
+     char str[] = "hello\0world";
+     // 数组长度：12 = helloworld\0,  字符串长度：5
+     printf("数组长度：%d, 字符串长度：%d\n", sizeof(str), strlen(str));
+     system("pause");
+}
+C：字符串方式3： char str[2] = {'a', 'b', '\0'}
+char str[] = {'a', 'b', '\0'}; // 这种定义必须自己手动添加、0
+D：声明字符串， C语言就是用 字符指针表示字符串
+// 用 malloc 动态申请  ,  申请10个字符串 字节空间
+char* str = malloc(sizeof(char) * 10);
+
+    // 声明int指针
+    int* datas = malloc(sizeof(int) * 10);
+
+
+19. C的函数
+main(){
+   int datas[5]; // 相当于 int datas[] = new int[5]
+
+// 20， int是4个字节， 5个int是20
+   printf("数组大小 :%d\n", sizeof(datas));
+
+   // 数组长度 = 数组总长度/ 一个数组长度
+   printf("数组长度 :%d\n", sizeof(datas)/sizeof(datas[0])); // 5
+   system("pause");
+}
+
+（1）：sizeof 数组大小
+int datas[5];
+sizeof(datas)  ——  4个字节
+
+数组长度 = 数组总长度/ 一个数组长度
+Int len =  sizeof(datas)/sizeof(datas[0])
+（2）：strlen(data)
+strlen(name)：name的长度， 数到 \0结束。
+main(){
+
+     // 字符串长度是 10   字符串结束符 ： \0
+     char str[] = "helloworld"; // char* str = "helloworld";
+
+     // 数组长度：11 = helloworld\0,  字符串长度：10
+     printf("数组长度：%d, 字符串长度：%d\n", sizeof(str), strlen(str));
+     system("pause");
+}
+
+（3）：动态申请内存 malloc
+// 动态申请内存， 在堆里边。这里必须乘以 对应类型的 sizeof的值
+int* stus = malloc(sizeof(int) *  number);
+
+// 声明字符串， C语言就是用 字符指针表示字符串。
+// 用 malloc 动态申请  ,  申请10个字符串 字节空间
+char* str = malloc(sizeof(char) * 10);
+
+// 声明int指针
+int* datas = malloc(sizeof(int) * 10);
+
+（4）：追加内存 realloc
+// 追加内存： 在原来基础上 继续追加 number + numberAppend  个内存
+stus = realloc(stus, (number + numberAppend) * sizeof(int));
+
+20.C语言打印日志
+需要2步骤：
+（1）：给Android.mk添加
+
+LOCAL_PATH := $(call my-dir)
+include $(CLEAR_VARS)
+
+#打印log需要添加如下
+LOCAL_LDLIBS += -llog
+
+#要生成的 so库文件名称
+LOCAL_MODULE:=hellolib
+#这个是我们写的 hello.c文件 ，然后编译后叫做 hellolib动态库，在java中加载这个库，然后调用定义的 native方法
+LOCAL_SRC_FILES:=hello.c cstr.c
+
+include $(BUILD_SHARED_LIBRARY)
+
+（2）：给 .c文件添加如下， 这里就是 给 hello.c 文件中添加
+#include <jni.h> // 把jni.h头文件 导入进来后， 就可以用 jni.h 中所有的变量、方法
+#include <string.h> // strlen()获取 c的字符串长度 , 在 这个头文件里边
+#include <stdlib.h>
+
+// c语言 打印日志， 需要添加如下， 同时给
+#include <android/log.h>
+#define LOG_TAG "System.out"
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+（3）用法：
+LOGI("java2CString 已经开始执行了.......");  // 打印方法入口
+
+LOGI("长度length：%d\n", length);  // 打印 int类型
+
+LOGI("cstr：%s\n", cstr);   // 打印字符串
+
+21. 静态内存和动态内存
+静态内存是： 在栈中，直接定义， 如： char str = {‘a’ , ‘b’,  ‘\0’};、char* str = “helloworld”，是只读的，不能修改
+
+动态内存是：堆， 用 malloc，   这个是可以修改字符串的。
+// 动态申请内存， 在堆里边。这里必须乘以 对应类型的 sizeof的值
+int* stus = malloc(number * sizeof(int));
+
+22. 学生学籍管理系统示例
+代码如下：
+#include <stdio.h>
+#include <stdlib.h>
+
+// 遍历并打印学生
+void printStus(int* s, int len){
+     int i = 0;
+     for(; i<len; i++){
+           printf("第%d 个学生的学号为：%d\n", i+1, s[i]);
+     }
+
+}
+
+
+main(){
+
+    printf("欢迎使用 学生学籍管理系统\n");
+
+    int number; // 学生的数量
+    printf("请输入 录入学生的数量: ");
+    scanf("%d", &number);
+
+    if(number < 1) {
+         printf("请按套路出牌\n");
+         system("pause");
+         return;
+    }
+
+    // 请输入合法的数字   等价于 int stus[number]
+    // 动态申请内存， 在堆里边。每个申请，都必须乘以 对应类型的 sizeof的值
+    int* stus = malloc(number * sizeof(int));
+
+    int i = 0;
+    for(; i< number; i++){
+      printf("请输入第 %d 个学生的学号：", (i+1));
+      scanf("%d", stus+i);
+    }
+
+    int type;
+    printf("%d 个学号已经输入完毕， 查看学生请 输入1， 追加学生请 输入2\n, 请输入"+number);
+
+    scanf("%d", &type);
+
+    // 输入的是 1
+    if(type == 1){
+        printStus(stus, number);
+    } else if(type != 2){
+           // 输入的不是 2
+        printf("请按套路出牌\n");
+         system("pause");
+         return;
+    } else {
+      int numberAppend; // 追加的学生
+      printf("请输入追加学生的数量");
+      scanf("%d", &numberAppend);
+
+      // 追加内存： 在原来基础上 继续追加 number + numberAppend  个内存
+      stus = realloc(stus, (number + numberAppend) * sizeof(int));
+      for(; i < number+numberAppend; i++){
+          printf("请输入第 %d个学生学号：", (i+1));
+          scanf("%d", stus + i);
+      }
+
+      printStus(stus, number+numberAppend);
+    }
+    system("pause");
+}
+
+
+
+验证结果如下：
+欢迎使用 学生学籍管理系统
+请输入 录入学生的数量: 2
+请输入第 1 个学生的学号：101
+请输入第 2 个学生的学号：102
+ 个学号已经输入完毕， 查看学生请 输入1， 追加学生请 输入2
+, 请输入2
+请输入追加学生的数量2
+请输入第 3个学生学号：103
+请输入第 4个学生学号：104
+第1 个学生的学号为：101
+第2 个学生的学号为：102
+第3 个学生的学号为：103
+第4 个学生的学号为：104
+请按任意键继续. . .
+
+23. struct 结构体
+专门用于定义 对象， 相当于 java中的 空对象。
+#include <stdio.h>
+#include <stdlib.h>
+
+// 结构体，用于定义对象。 相当于java中的 空对象， 没有属性。
+struct Student{
+   int id;  // 学号
+   int age; // 年龄
+   char* name; // 姓名字符串
+};
+
+
+// 类型定义 用 STU代表 struct Student
+typedef struct Student STU;
+
+// 类型定义 用haha 代表 int
+typedef int haha;
+
+main(){
+
+   // 这里的 haha 就是int， 相当于 int number=5
+   haha number = 5;
+
+   // 声明学生的变量对象，  STU 就是上边的  struct Student
+   STU stu;
+   system("pause");
+}
+24. typedef 类型定义
+#include <stdio.h>
+#include <stdlib.h>
+
+// 结构体，用于定义对象。 相当于java中的 空对象， 没有属性。
+struct Student{
+   int id;  // 学号
+   int age; // 年龄
+   char* name; // 姓名字符串
+};
+
+
+// 类型定义 用 STU代表 struct Student，  这个是一个整体。
+typedef struct Student STU;
+
+// 类型定义 用haha 代表 int
+typedef int haha;
+
+main(){
+
+   // 这里的 haha 就是int， 相当于 int number=5
+   haha number = 5;
+
+   // 声明学生的变量对象，  STU 就是上边的  struct Student
+   STU stu;
+   system("pause");
+}
+25. Student对象的 字节数
+#include <stdio.h>
+#include <stdlib.h>
+
+// 结构体，用于定义对象。 相当于java中的 空对象， 没有属性。
+struct Student{
+    // 第一种： 正常情况   12个字节
+   // 学号    4个字节 （int类型）
+   //int id;
+   // 年龄    4个字节（int类型）
+   //int age;
+    // 姓名字符串    4个字节（所以指针都是 4个字节）
+   //char* name;
+
+
+   // 第二种： char 和 short放到一起写 , 总字节数还是 12，CPU以4为单位， 1+2=3不够4，会补齐为4. 加上下边的4 总共 12
+   //int id;   // 4
+   //char sex; // 1
+   //short age; // 2
+   //char *name; // 4 所有指针都是 4个字节
+
+   // 第三种： 如下，char写上边， short写下边。 1和2都不够4，用4补齐。 总字节数16  所以一般把不够4个的写在一起，节约内存。
+   int id;   // 4
+   char sex; // 1
+   char *name; // 4 所有指针都是 4个字节
+   short age; // 2
+};
+
+
+// 类型定义 用 STU代表 struct Student
+typedef struct Student STU;
+
+// 类型定义 用haha 代表 int
+typedef int haha;
+
+main(){
+
+   // 这里的 haha 就是int， 相当于 int number=5
+   haha number = 5;
+
+   // 声明学生的变量对象，  STU 就是上边的  struct Student
+   STU s1;
+   printf("s1 = %d\n", sizeof(s1));  // 12
+   system("pause");
+}
+26. 给结构体 struct Student对象赋值
+（1）： 整体赋值：
+ // 这里的顺序就是 上边定义结构体 struct Student中变量的顺序
+STU s1 = {101, 'm', 22, "andy"};
+（2）： 单独给变量赋值
+ STU s1;
+ s1.id = 1011;
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// 结构体，用于定义对象。 相当于java中的 空对象， 没有属性。
+struct Student{
+   int id;   // 4
+   char sex; // 1
+   short age; // 2
+   char *name; // 4 所有指针都是 4个字节
+};
+
+
+// typedef 类型定义 用 STU代表 struct Student
+typedef struct Student STU;
+main(){
+
+
+   // 整体赋值：
+   // 声明学生的变量对象，  STU 就是上边的  struct Student
+   // 给结构体变量 s1赋值， 用{}
+   // STU s1 = {101, 'm', 22, "andy"}; // 这里的顺序就是 上边定义结构体 struct Student中变量的顺序
+
+   // 单独赋值：
+   STU s1;
+   s1.id = 1011;
+   printf("s1.id: %d\n", s1.id);  // s1.id: 1011
+
+   // 打印属性
+   printf("stu.name: %s\n", s1.name); // stu.name: andy
+   system("pause");
+}
+（3）：打印 struct Student结构体指针
+#include <stdio.h>
+#include <stdlib.h>
+
+// 结构体，用于定义对象。 相当于java中的 空对象， 没有属性。
+struct Student{
+   // 第二种： char 和 short放到一起写 , 总字节数还是 12，CPU以4为单位， 1+2=3不够4，会补齐为4. 加上下边的4 总共 12
+   int id;   // 4
+   char sex; // 1
+   short age; // 2
+   char *name; // 4 所有指针都是 4个字节
+};
+
+// 类型定义 用 STU代表 struct Student
+typedef struct Student STU;
+
+main() {
+   // 定义 指针变量
+   STU* ps = &s1;
+   printf("ps size: %d\n", sizeof(ps)); // 4  所以类型指针 大小都是4.
+
+   // 指针变量ps  可以指向 结构体的指针
+   // C中指针 获取结构体的 属性：
+
+   // 方式1：
+   printf("stu.id=%d\n", (*ps).id);  // 1011
+
+
+   // 方式2： 指针的访问形式
+   printf("stu.id = %d\n", ps->id); // 1011
+
+   system("pause");
+}
+（4）： 结构体中 只能用这种 stu.id  .的方式 获取属性
+27.C中指针 获取结构体的 属性：
+// 方式1： (*ps).xxx
+printf("stu.id=%d\n", (*ps).id);  // 1011
+
+// 方式2： 指针的访问形式 ps->xxx
+printf("stu.id = %d\n", ps->id); // 1011
+
+
+28. 注意：
+（1）： 所有类型的指针变量 sizeof(xx) 都是4字节，
+（2）：C语言的结构体， 只能声明属性，不能声明方法。但是可以声明函数指针。 C++可以。C++中的结构体和类几乎一样。
+29.函数指针
+（1）：函数指针定义：
+int (*op)(int a, int b)  ：   op 是一个变量名，可以赋值 , 表示 函数声明
+指针只要是 指针用 ()  小括号括起来， 就是 函数指针。JNI中全部是 函数指针。
+
+举例如下：
+#include <stdio.h>
+#include <stdlib.h>
+
+int add(int a, int b){
+    return a+b;
+}
+
+int mul(int a, int b){
+    return a*b;
+}
+
+// 函数名 就是 函数的入口地址 ， 也是指针。
+main(){
+   // op 是一个变量名，可以赋值 , 表示 函数声明
+   int (*op)(int a, int b);
+
+   // op 指向 add 函数， 就可以 用 op表示 add方法名
+   op = add;
+   int result = op(3, 5);
+   printf("result: %d\n", result);   // result: 8
+
+
+   op = mul;
+   int result2 = op(3, 5);
+   printf("result2: %d\n", result2);  // result: 15
+   system("pause");
+}
+（2）：在结构体中定义 函数指针
+#include <stdio.h>
+#include <stdlib.h>
+
+int add(int a, int b){
+    return a+b;
+}
+
+struct Student{
+      int id;
+      char sex;
+      short age;
+      char* name;
+      int (*op)(int a, int b); //  op是变量名 ， 函数指针 ，这个变量能指向函数。
+};
+
+// 类型定义
+typedef struct Student STU;
+
+// 函数名 就是 函数的入口地址 ， 也是指针。
+main(){
+
+   // 给结构体赋值，整体赋值。 最后一个是 add， 说明 调用的是 add 方法
+    STU s1 = {101,'m',22,"andy",add};
+      s1.id = 1011;
+      STU* ps = &s1;
+   // 指针变量调用 结构体中定义的op
+   int addResult = ps->op(4, 6); // (*ps).op(4, 6) 、 s1.op(4,6)
+   printf("addResult: %d\n", addResult);    // 10
+
+   system("pause");
+}
+30.联合体
+（1）：联合体定义：
+联合体，也叫 公共体， 就是成员属性是公共部分的。 成员中最大的数据类型，就是该联合体的长度。如下：
+#include <stdio.h>
+#include <stdlib.h>
+
+// 语法
+union Data{
+
+      // 定义3个属性
+      char c;
+      int num;
+      short s;
+};
+
+main(){
+    // 成员最大的数据类型，作为该联合体的长度。Int是最大的数据类型，4个字节。
+    printf("联合体长度：%d\n", sizeof(union Data)); // 联合体长度：4
+    system("pause");
+}
+（2）：联合体使用
+
+
+上边的 联合体取最大数据类型， 就是 int的4个字节。char、int、short 都只共用中间 int类型的 内存。
+char 的是1个字节， 所以取 第1个 61.
+short 的是 2个字节， 所以取 第1、2个61、13.
+
+
+代码如下：
+#include <stdio.h>
+#include <stdlib.h>
+
+// 语法
+union Data{
+
+      // 定义3个属性
+      char c;
+      int num;
+      short s;
+};
+
+main(){
+
+    // 公共体（也叫联合体）。 以成员最大的数据类型，作为该联合体的长度。
+    union Data d;
+    d.num = 0x11221361; // 十六进制数
+    printf("%c: \n", d.c);  // a（十六进制的 61，就是16*6+1=97，就是a）
+    printf("%hd: \n", d.s); // 24851（十六进制的6113， 十进制就是24851）
+
+
+printf("联合体长度：%d\n", sizeof(union Data));
+system("pause");
+}
+31.enum枚举类型
+（1）： 直接声明枚举
+#include <stdio.h>
+#include <stdlib.h>
+
+enum Color{
+ red, black, green, yellow, cyan, blue
+};
+
+main(){
+
+   // 声明成员
+   enum Color c;
+   //c = red;
+   //printf("%d: \n", c); // 0：  因为 red是第0个元素
+
+   c=yellow;
+   printf("%d: \n", c); // 3： yellow是 第3个元素
+
+
+   system("pause");
+}
+（2）：给枚举赋值
+#include <stdio.h>
+#include <stdlib.h>
+
+enum Color{
+     red=1, black, green, yellow, cyan, blue
+};
+
+main(){
+
+   // 声明成员
+   enum Color c;
+
+   c=yellow;
+   printf("%d: \n", c); // 4   red=1： 说明yellow是 第4个元素
+   system("pause");
+}
+31： 宏定义
+#include <stdio.h>
+#include <stdlib.h>
+
+// 没有参数的宏
+#define null
+
+// 有参数的宏
+#define mul(a, b) ((a) * (b))
+
+main(){
+   printf("%d: \n", mul(3+2, 2+4)*3);  // 90
+   system("pause");
+}
+32.static 变量
+静态变量，就是 全局变量， 只初始化一次， 在静态存储里边。
+
+（1）： 不加 static 打印i的值：
+#include <stdio.h>
+#include <stdlib.h>
+
+void add(){
+     int i=5;
+     i++;
+     printf("i = %d\n", i);  // i=6； i=6
+
+}
+main(){
+   add();
+   add();
+   system("pause");
+}
+（2）： 添加 static 打印i 的值：
+#include <stdio.h>
+#include <stdlib.h>
+
+void add(){
+     static int i = 5; // 全局变量， 静态的变量只初始化一次，在静态存储间。
+     i++;
+     printf("i = %d\n", i);  // i=6，  i=7
+}
+main(){
+   add();
+   add();
+   system("pause");
+}
+33. jni.h头文件理解
+
+1.C的8种基本数据类型 对应的 java 数据类型
+下边中间的j开头的， 是 java的数据类型
+#ifdef HAVE_INTTYPES_H
+# include <inttypes.h>      /* C99 */
+typedef uint8_t         jboolean;       /* unsigned 8 bits */
+typedef int8_t          jbyte;          /* signed 8 bits */
+typedef uint16_t        jchar;          /* unsigned 16 bits */
+typedef int16_t         jshort;         /* signed 16 bits */
+typedef int32_t         jint;           /* signed 32 bits */
+typedef int64_t         jlong;          /* signed 64 bits */
+typedef float           jfloat;         /* 32-bit IEEE 754 */
+typedef double          jdouble;        /* 64-bit IEEE 754 */
+// 以上是C++标准
+
+// 以下是 C语言标准
+#else
+typedef unsigned char   jboolean;       /* unsigned 8 bits */
+typedef signed char     jbyte;          /* signed 8 bits */
+typedef unsigned short  jchar;          /* unsigned 16 bits */
+typedef short           jshort;         /* signed 16 bits */
+typedef int             jint;           /* signed 32 bits */
+typedef long long       jlong;          /* signed 64 bits */
+typedef float           jfloat;         /* 32-bit IEEE 754 */
+typedef double          jdouble;        /* 64-bit IEEE 754 */
+
+
+java的 8种基本类型 和 C对应的类型。 j开头的都是java的意思，后边的就是java的类型。
+unsigned char 无符号的char  ——  jboolean  1个字节
+signed char 有符号的char     —— jbyte 1个字节
+unsigned short 无符号的short（short是2个字节，无符号的short是1个字节）  —— jchar 1个字节
+short —— jshort
+int  —— jint
+long long —— jlong
+float  —— jfloat
+double —— jdouble
+2.C的引用类型 对应 java的引用类型
+/*
+ * Reference types, in C++
+ */
+class _jobject {};
+class _jclass : public _jobject {};
+class _jstring : public _jobject {};
+class _jarray : public _jobject {};
+class _jobjectArray : public _jarray {};
+class _jbooleanArray : public _jarray {};
+class _jbyteArray : public _jarray {};
+class _jcharArray : public _jarray {};
+class _jshortArray : public _jarray {};
+class _jintArray : public _jarray {};
+class _jlongArray : public _jarray {};
+class _jfloatArray : public _jarray {};
+class _jdoubleArray : public _jarray {};
+class _jthrowable : public _jobject {};
+
+typedef _jobject*       jobject;
+typedef _jclass*        jclass;
+typedef _jstring*       jstring;
+typedef _jarray*        jarray;
+typedef _jobjectArray*  jobjectArray;
+typedef _jbooleanArray* jbooleanArray;
+typedef _jbyteArray*    jbyteArray;
+typedef _jcharArray*    jcharArray;
+typedef _jshortArray*   jshortArray;
+typedef _jintArray*     jintArray;
+typedef _jlongArray*    jlongArray;
+typedef _jfloatArray*   jfloatArray;
+typedef _jdoubleArray*  jdoubleArray;
+typedef _jthrowable*    jthrowable;
+typedef _jobject*       jweak;
+#else /* not __cplusplus */
+// 以上是 C++的引用类型 和 java 对应的关系
+
+// 以下是 C的引用类型 和 java 对应的关系
+/*
+ * Reference types, in C.
+ */
+typedef void*           jobject;
+typedef jobject         jclass;
+typedef jobject         jstring;
+typedef jobject         jarray;
+typedef jarray          jobjectArray;
+typedef jarray          jbooleanArray;
+typedef jarray          jbyteArray;
+typedef jarray          jcharArray;
+typedef jarray          jshortArray;
+typedef jarray          jintArray;
+typedef jarray          jlongArray;
+typedef jarray          jfloatArray;
+typedef jarray          jdoubleArray;
+typedef jobject         jthrowable;
+typedef jobject         jweak;
+
+
+void* 是无返回值的指针，用的时候可以强转。 malloc方法返回的就是 void *指针。如下是声明 字符串指针 和 int指针：
+
+#include <stdio.h> // 标准的io头文件
+#include <stdlib.h> // 标准的C函数库头文件
+
+main(){
+
+    // 声明字符串， C语言就是用 字符指针表示字符串。
+    // 用 malloc 动态申请  ,  申请10个字符串 字节空间
+    char* str = malloc(sizeof(char) * 10);
+
+    // 声明int指针
+    int* datas = malloc(sizeof(int) * 10);
+
+    system("pause");
+}
+3. 结构体指针
+// typedef 对结构体指针JNINativeInterface*  做了 类型定义
+typedef const struct JNINativeInterface* JNIEnv;
+typedef const struct JNIInvokeInterface* JavaVM;
+
+
+/*关键的结构体。
+ *  java中是 Interface接口规范。 JNI中是 JNINativeInterface本地接口规范， 是一个结构体。 只能声明属性，不能声明函数。
+ */
+struct JNINativeInterface {
+
+    // 返回java的字符串 jstring    用C的方式创建字符串(*NewString)(JNIEnv*, const jchar*, jsize)
+    jstring     (*NewString)(JNIEnv*, const jchar*, jsize);
+    jsize       (*GetStringLength)(JNIEnv*, jstring);
+
+ // 以上：  左边的都是 java返回的类型   右边的都是 用C的方式调用来返回 左边java要返回的类型。
+
+4. 用JNIEnv* env 调用 JNINativeInterface中的方法
+示例如下： 下边红色的是 写的示例demo
+JNIEnv* env;
+// 比如获取版本
+(*env)->getVersion
+(**env).getVersion
+
+// 上边的  JNIEnv 就是下边的 JNINativeInterface*
+// 所以 JNIEnv* 对应  JNINativeInterface**
+JNINativeInterface** env;
+// 有几个星号，就用几个星号
+(**env).getVersion   // 后边的 .方法  调用下边JNINativeInterface的 方法
+
+#else
+
+// typedef 对结构体指针JNINativeInterface*  做了类型定义 ，这里声明的 结构体指针
+typedef const struct JNINativeInterface* JNIEnv;
+typedef const struct JNIInvokeInterface* JavaVM;
+
+
+/*
+ * 关键的结构体。
+ *    java中是 Interface接口规范。
+*   JNI中是 JNINativeInterface本地接口规范， 是一个结构体。 只能声明属性，不能声明函数。  专门用上边定义的 (*env)->xxx   调用下边的方法。
+ */
+struct JNINativeInterface {
+    void*       reserved0;
+    void*       reserved1;
+    void*       reserved2;
+    void*       reserved3;
+
+    jint        (*GetVersion)(JNIEnv *);
+
+    jclass      (*DefineClass)(JNIEnv*, const char*, jobject, const jbyte*,
+                        jsize);
+    jclass      (*FindClass)(JNIEnv*, const char*);
+
+    jmethodID   (*FromReflectedMethod)(JNIEnv*, jobject);
+    jfieldID    (*FromReflectedField)(JNIEnv*, jobject);
+    /* spec doesn't show jboolean parameter */
+    jobject     (*ToReflectedMethod)(JNIEnv*, jclass, jmethodID, jboolean);
+
+    jclass      (*GetSuperclass)(JNIEnv*, jclass);
+    jboolean    (*IsAssignableFrom)(JNIEnv*, jclass, jclass);
+
+    /* spec doesn't show jboolean parameter */
+    jobject     (*ToReflectedField)(JNIEnv*, jclass, jfieldID, jboolean);
+
+    jint        (*Throw)(JNIEnv*, jthrowable);
+    jint        (*ThrowNew)(JNIEnv *, jclass, const char *);
+    jthrowable  (*ExceptionOccurred)(JNIEnv*);
+    void        (*ExceptionDescribe)(JNIEnv*);
+    void        (*ExceptionClear)(JNIEnv*);
+    void        (*FatalError)(JNIEnv*, const char*);
+
+    jint        (*PushLocalFrame)(JNIEnv*, jint);
+    jobject     (*PopLocalFrame)(JNIEnv*, jobject);
+
+    jobject     (*NewGlobalRef)(JNIEnv*, jobject);
+    void        (*DeleteGlobalRef)(JNIEnv*, jobject);
+    void        (*DeleteLocalRef)(JNIEnv*, jobject);
+    jboolean    (*IsSameObject)(JNIEnv*, jobject, jobject);
+
+    jobject     (*NewLocalRef)(JNIEnv*, jobject);
+    jint        (*EnsureLocalCapacity)(JNIEnv*, jint);
+
+    jobject     (*AllocObject)(JNIEnv*, jclass);
+    jobject     (*NewObject)(JNIEnv*, jclass, jmethodID, ...);
+    jobject     (*NewObjectV)(JNIEnv*, jclass, jmethodID, va_list);
+    jobject     (*NewObjectA)(JNIEnv*, jclass, jmethodID, jvalue*);
+
+    jclass      (*GetObjectClass)(JNIEnv*, jobject);
+    jboolean    (*IsInstanceOf)(JNIEnv*, jobject, jclass);
+    jmethodID   (*GetMethodID)(JNIEnv*, jclass, const char*, const char*);
+
+    jobject     (*CallObjectMethod)(JNIEnv*, jobject, jmethodID, ...);
+    jobject     (*CallObjectMethodV)(JNIEnv*, jobject, jmethodID, va_list);
+    jobject     (*CallObjectMethodA)(JNIEnv*, jobject, jmethodID, jvalue*);
+    jboolean    (*CallBooleanMethod)(JNIEnv*, jobject, jmethodID, ...);
+    jboolean    (*CallBooleanMethodV)(JNIEnv*, jobject, jmethodID, va_list);
+    jboolean    (*CallBooleanMethodA)(JNIEnv*, jobject, jmethodID, jvalue*);
+    jbyte       (*CallByteMethod)(JNIEnv*, jobject, jmethodID, ...);
+    jbyte       (*CallByteMethodV)(JNIEnv*, jobject, jmethodID, va_list);
+    jbyte       (*CallByteMethodA)(JNIEnv*, jobject, jmethodID, jvalue*);
+    jchar       (*CallCharMethod)(JNIEnv*, jobject, jmethodID, ...);
+    jchar       (*CallCharMethodV)(JNIEnv*, jobject, jmethodID, va_list);
+    jchar       (*CallCharMethodA)(JNIEnv*, jobject, jmethodID, jvalue*);
+    jshort      (*CallShortMethod)(JNIEnv*, jobject, jmethodID, ...);
+    jshort      (*CallShortMethodV)(JNIEnv*, jobject, jmethodID, va_list);
+    jshort      (*CallShortMethodA)(JNIEnv*, jobject, jmethodID, jvalue*);
+    jint        (*CallIntMethod)(JNIEnv*, jobject, jmethodID, ...);
+    jint        (*CallIntMethodV)(JNIEnv*, jobject, jmethodID, va_list);
+    jint        (*CallIntMethodA)(JNIEnv*, jobject, jmethodID, jvalue*);
+    jlong       (*CallLongMethod)(JNIEnv*, jobject, jmethodID, ...);
+    jlong       (*CallLongMethodV)(JNIEnv*, jobject, jmethodID, va_list);
+    jlong       (*CallLongMethodA)(JNIEnv*, jobject, jmethodID, jvalue*);
+    jfloat      (*CallFloatMethod)(JNIEnv*, jobject, jmethodID, ...);
+    jfloat      (*CallFloatMethodV)(JNIEnv*, jobject, jmethodID, va_list);
+    jfloat      (*CallFloatMethodA)(JNIEnv*, jobject, jmethodID, jvalue*);
+    jdouble     (*CallDoubleMethod)(JNIEnv*, jobject, jmethodID, ...);
+    jdouble     (*CallDoubleMethodV)(JNIEnv*, jobject, jmethodID, va_list);
+    jdouble     (*CallDoubleMethodA)(JNIEnv*, jobject, jmethodID, jvalue*);
+    void        (*CallVoidMethod)(JNIEnv*, jobject, jmethodID, ...);
+    void        (*CallVoidMethodV)(JNIEnv*, jobject, jmethodID, va_list);
+    void        (*CallVoidMethodA)(JNIEnv*, jobject, jmethodID, jvalue*);
+
+    jobject     (*CallNonvirtualObjectMethod)(JNIEnv*, jobject, jclass,
+                        jmethodID, ...);
+    jobject     (*CallNonvirtualObjectMethodV)(JNIEnv*, jobject, jclass,
+                        jmethodID, va_list);
+    jobject     (*CallNonvirtualObjectMethodA)(JNIEnv*, jobject, jclass,
+                        jmethodID, jvalue*);
+    jboolean    (*CallNonvirtualBooleanMethod)(JNIEnv*, jobject, jclass,
+                        jmethodID, ...);
+    jboolean    (*CallNonvirtualBooleanMethodV)(JNIEnv*, jobject, jclass,
+                         jmethodID, va_list);
+    jboolean    (*CallNonvirtualBooleanMethodA)(JNIEnv*, jobject, jclass,
+                         jmethodID, jvalue*);
+    jbyte       (*CallNonvirtualByteMethod)(JNIEnv*, jobject, jclass,
+                        jmethodID, ...);
+    jbyte       (*CallNonvirtualByteMethodV)(JNIEnv*, jobject, jclass,
+                        jmethodID, va_list);
+    jbyte       (*CallNonvirtualByteMethodA)(JNIEnv*, jobject, jclass,
+                        jmethodID, jvalue*);
+    jchar       (*CallNonvirtualCharMethod)(JNIEnv*, jobject, jclass,
+                        jmethodID, ...);
+    jchar       (*CallNonvirtualCharMethodV)(JNIEnv*, jobject, jclass,
+                        jmethodID, va_list);
+    jchar       (*CallNonvirtualCharMethodA)(JNIEnv*, jobject, jclass,
+                        jmethodID, jvalue*);
+    jshort      (*CallNonvirtualShortMethod)(JNIEnv*, jobject, jclass,
+                        jmethodID, ...);
+    jshort      (*CallNonvirtualShortMethodV)(JNIEnv*, jobject, jclass,
+                        jmethodID, va_list);
+    jshort      (*CallNonvirtualShortMethodA)(JNIEnv*, jobject, jclass,
+                        jmethodID, jvalue*);
+    jint        (*CallNonvirtualIntMethod)(JNIEnv*, jobject, jclass,
+                        jmethodID, ...);
+    jint        (*CallNonvirtualIntMethodV)(JNIEnv*, jobject, jclass,
+                        jmethodID, va_list);
+    jint        (*CallNonvirtualIntMethodA)(JNIEnv*, jobject, jclass,
+                        jmethodID, jvalue*);
+    jlong       (*CallNonvirtualLongMethod)(JNIEnv*, jobject, jclass,
+                        jmethodID, ...);
+    jlong       (*CallNonvirtualLongMethodV)(JNIEnv*, jobject, jclass,
+                        jmethodID, va_list);
+    jlong       (*CallNonvirtualLongMethodA)(JNIEnv*, jobject, jclass,
+                        jmethodID, jvalue*);
+    jfloat      (*CallNonvirtualFloatMethod)(JNIEnv*, jobject, jclass,
+                        jmethodID, ...);
+    jfloat      (*CallNonvirtualFloatMethodV)(JNIEnv*, jobject, jclass,
+                        jmethodID, va_list);
+    jfloat      (*CallNonvirtualFloatMethodA)(JNIEnv*, jobject, jclass,
+                        jmethodID, jvalue*);
+    jdouble     (*CallNonvirtualDoubleMethod)(JNIEnv*, jobject, jclass,
+                        jmethodID, ...);
+    jdouble     (*CallNonvirtualDoubleMethodV)(JNIEnv*, jobject, jclass,
+                        jmethodID, va_list);
+    jdouble     (*CallNonvirtualDoubleMethodA)(JNIEnv*, jobject, jclass,
+                        jmethodID, jvalue*);
+    void        (*CallNonvirtualVoidMethod)(JNIEnv*, jobject, jclass,
+                        jmethodID, ...);
+    void        (*CallNonvirtualVoidMethodV)(JNIEnv*, jobject, jclass,
+                        jmethodID, va_list);
+    void        (*CallNonvirtualVoidMethodA)(JNIEnv*, jobject, jclass,
+                        jmethodID, jvalue*);
+
+    jfieldID    (*GetFieldID)(JNIEnv*, jclass, const char*, const char*);
+
+    jobject     (*GetObjectField)(JNIEnv*, jobject, jfieldID);
+    jboolean    (*GetBooleanField)(JNIEnv*, jobject, jfieldID);
+    jbyte       (*GetByteField)(JNIEnv*, jobject, jfieldID);
+    jchar       (*GetCharField)(JNIEnv*, jobject, jfieldID);
+    jshort      (*GetShortField)(JNIEnv*, jobject, jfieldID);
+    jint        (*GetIntField)(JNIEnv*, jobject, jfieldID);
+    jlong       (*GetLongField)(JNIEnv*, jobject, jfieldID);
+    jfloat      (*GetFloatField)(JNIEnv*, jobject, jfieldID);
+    jdouble     (*GetDoubleField)(JNIEnv*, jobject, jfieldID);
+
+    void        (*SetObjectField)(JNIEnv*, jobject, jfieldID, jobject);
+    void        (*SetBooleanField)(JNIEnv*, jobject, jfieldID, jboolean);
+    void        (*SetByteField)(JNIEnv*, jobject, jfieldID, jbyte);
+    void        (*SetCharField)(JNIEnv*, jobject, jfieldID, jchar);
+    void        (*SetShortField)(JNIEnv*, jobject, jfieldID, jshort);
+    void        (*SetIntField)(JNIEnv*, jobject, jfieldID, jint);
+    void        (*SetLongField)(JNIEnv*, jobject, jfieldID, jlong);
+    void        (*SetFloatField)(JNIEnv*, jobject, jfieldID, jfloat);
+    void        (*SetDoubleField)(JNIEnv*, jobject, jfieldID, jdouble);
+
+    jmethodID   (*GetStaticMethodID)(JNIEnv*, jclass, const char*, const char*);
+
+    jobject     (*CallStaticObjectMethod)(JNIEnv*, jclass, jmethodID, ...);
+    jobject     (*CallStaticObjectMethodV)(JNIEnv*, jclass, jmethodID, va_list);
+    jobject     (*CallStaticObjectMethodA)(JNIEnv*, jclass, jmethodID, jvalue*);
+    jboolean    (*CallStaticBooleanMethod)(JNIEnv*, jclass, jmethodID, ...);
+    jboolean    (*CallStaticBooleanMethodV)(JNIEnv*, jclass, jmethodID,
+                        va_list);
+    jboolean    (*CallStaticBooleanMethodA)(JNIEnv*, jclass, jmethodID,
+                        jvalue*);
+    jbyte       (*CallStaticByteMethod)(JNIEnv*, jclass, jmethodID, ...);
+    jbyte       (*CallStaticByteMethodV)(JNIEnv*, jclass, jmethodID, va_list);
+    jbyte       (*CallStaticByteMethodA)(JNIEnv*, jclass, jmethodID, jvalue*);
+    jchar       (*CallStaticCharMethod)(JNIEnv*, jclass, jmethodID, ...);
+    jchar       (*CallStaticCharMethodV)(JNIEnv*, jclass, jmethodID, va_list);
+    jchar       (*CallStaticCharMethodA)(JNIEnv*, jclass, jmethodID, jvalue*);
+    jshort      (*CallStaticShortMethod)(JNIEnv*, jclass, jmethodID, ...);
+    jshort      (*CallStaticShortMethodV)(JNIEnv*, jclass, jmethodID, va_list);
+    jshort      (*CallStaticShortMethodA)(JNIEnv*, jclass, jmethodID, jvalue*);
+    jint        (*CallStaticIntMethod)(JNIEnv*, jclass, jmethodID, ...);
+    jint        (*CallStaticIntMethodV)(JNIEnv*, jclass, jmethodID, va_list);
+    jint        (*CallStaticIntMethodA)(JNIEnv*, jclass, jmethodID, jvalue*);
+    jlong       (*CallStaticLongMethod)(JNIEnv*, jclass, jmethodID, ...);
+    jlong       (*CallStaticLongMethodV)(JNIEnv*, jclass, jmethodID, va_list);
+    jlong       (*CallStaticLongMethodA)(JNIEnv*, jclass, jmethodID, jvalue*);
+    jfloat      (*CallStaticFloatMethod)(JNIEnv*, jclass, jmethodID, ...);
+    jfloat      (*CallStaticFloatMethodV)(JNIEnv*, jclass, jmethodID, va_list);
+    jfloat      (*CallStaticFloatMethodA)(JNIEnv*, jclass, jmethodID, jvalue*);
+    jdouble     (*CallStaticDoubleMethod)(JNIEnv*, jclass, jmethodID, ...);
+    jdouble     (*CallStaticDoubleMethodV)(JNIEnv*, jclass, jmethodID, va_list);
+    jdouble     (*CallStaticDoubleMethodA)(JNIEnv*, jclass, jmethodID, jvalue*);
+    void        (*CallStaticVoidMethod)(JNIEnv*, jclass, jmethodID, ...);
+    void        (*CallStaticVoidMethodV)(JNIEnv*, jclass, jmethodID, va_list);
+    void        (*CallStaticVoidMethodA)(JNIEnv*, jclass, jmethodID, jvalue*);
+
+    jfieldID    (*GetStaticFieldID)(JNIEnv*, jclass, const char*,
+                        const char*);
+
+    jobject     (*GetStaticObjectField)(JNIEnv*, jclass, jfieldID);
+    jboolean    (*GetStaticBooleanField)(JNIEnv*, jclass, jfieldID);
+    jbyte       (*GetStaticByteField)(JNIEnv*, jclass, jfieldID);
+    jchar       (*GetStaticCharField)(JNIEnv*, jclass, jfieldID);
+    jshort      (*GetStaticShortField)(JNIEnv*, jclass, jfieldID);
+    jint        (*GetStaticIntField)(JNIEnv*, jclass, jfieldID);
+    jlong       (*GetStaticLongField)(JNIEnv*, jclass, jfieldID);
+    jfloat      (*GetStaticFloatField)(JNIEnv*, jclass, jfieldID);
+    jdouble     (*GetStaticDoubleField)(JNIEnv*, jclass, jfieldID);
+
+    void        (*SetStaticObjectField)(JNIEnv*, jclass, jfieldID, jobject);
+    void        (*SetStaticBooleanField)(JNIEnv*, jclass, jfieldID, jboolean);
+    void        (*SetStaticByteField)(JNIEnv*, jclass, jfieldID, jbyte);
+    void        (*SetStaticCharField)(JNIEnv*, jclass, jfieldID, jchar);
+    void        (*SetStaticShortField)(JNIEnv*, jclass, jfieldID, jshort);
+    void        (*SetStaticIntField)(JNIEnv*, jclass, jfieldID, jint);
+    void        (*SetStaticLongField)(JNIEnv*, jclass, jfieldID, jlong);
+    void        (*SetStaticFloatField)(JNIEnv*, jclass, jfieldID, jfloat);
+    void        (*SetStaticDoubleField)(JNIEnv*, jclass, jfieldID, jdouble);
+
+    // 返回java的字符串 jstring    用C的方式创建字符串(*NewString)(JNIEnv*, const jchar*, jsize)
+    // 左边的都是 java返回的类型   右边的都是 用C的方式调用来返回 左边java要返回的类型。
+    jstring     (*NewString)(JNIEnv*, const jchar*, jsize);
+    jsize       (*GetStringLength)(JNIEnv*, jstring);
+    const jchar* (*GetStringChars)(JNIEnv*, jstring, jboolean*);
+    void        (*ReleaseStringChars)(JNIEnv*, jstring, const jchar*);
+    jstring     (*NewStringUTF)(JNIEnv*, const char*);
+    jsize       (*GetStringUTFLength)(JNIEnv*, jstring);
+    /* JNI spec says this returns const jbyte*, but that's inconsistent */
+    const char* (*GetStringUTFChars)(JNIEnv*, jstring, jboolean*);
+    void        (*ReleaseStringUTFChars)(JNIEnv*, jstring, const char*);
+    jsize       (*GetArrayLength)(JNIEnv*, jarray);
+    jobjectArray (*NewObjectArray)(JNIEnv*, jsize, jclass, jobject);
+    jobject     (*GetObjectArrayElement)(JNIEnv*, jobjectArray, jsize);
+    void        (*SetObjectArrayElement)(JNIEnv*, jobjectArray, jsize, jobject);
+
+    jbooleanArray (*NewBooleanArray)(JNIEnv*, jsize);
+    jbyteArray    (*NewByteArray)(JNIEnv*, jsize);
+    jcharArray    (*NewCharArray)(JNIEnv*, jsize);
+    jshortArray   (*NewShortArray)(JNIEnv*, jsize);
+    jintArray     (*NewIntArray)(JNIEnv*, jsize);
+    jlongArray    (*NewLongArray)(JNIEnv*, jsize);
+    jfloatArray   (*NewFloatArray)(JNIEnv*, jsize);
+    jdoubleArray  (*NewDoubleArray)(JNIEnv*, jsize);
+
+    jboolean*   (*GetBooleanArrayElements)(JNIEnv*, jbooleanArray, jboolean*);
+    jbyte*      (*GetByteArrayElements)(JNIEnv*, jbyteArray, jboolean*);
+    jchar*      (*GetCharArrayElements)(JNIEnv*, jcharArray, jboolean*);
+    jshort*     (*GetShortArrayElements)(JNIEnv*, jshortArray, jboolean*);
+    jint*       (*GetIntArrayElements)(JNIEnv*, jintArray, jboolean*);
+    jlong*      (*GetLongArrayElements)(JNIEnv*, jlongArray, jboolean*);
+    jfloat*     (*GetFloatArrayElements)(JNIEnv*, jfloatArray, jboolean*);
+    jdouble*    (*GetDoubleArrayElements)(JNIEnv*, jdoubleArray, jboolean*);
+
+    void        (*ReleaseBooleanArrayElements)(JNIEnv*, jbooleanArray,
+                        jboolean*, jint);
+    void        (*ReleaseByteArrayElements)(JNIEnv*, jbyteArray,
+                        jbyte*, jint);
+    void        (*ReleaseCharArrayElements)(JNIEnv*, jcharArray,
+                        jchar*, jint);
+    void        (*ReleaseShortArrayElements)(JNIEnv*, jshortArray,
+                        jshort*, jint);
+    void        (*ReleaseIntArrayElements)(JNIEnv*, jintArray,
+                        jint*, jint);
+    void        (*ReleaseLongArrayElements)(JNIEnv*, jlongArray,
+                        jlong*, jint);
+    void        (*ReleaseFloatArrayElements)(JNIEnv*, jfloatArray,
+                        jfloat*, jint);
+    void        (*ReleaseDoubleArrayElements)(JNIEnv*, jdoubleArray,
+                        jdouble*, jint);
+
+    void        (*GetBooleanArrayRegion)(JNIEnv*, jbooleanArray,
+                        jsize, jsize, jboolean*);
+    void        (*GetByteArrayRegion)(JNIEnv*, jbyteArray,
+                        jsize, jsize, jbyte*);
+    void        (*GetCharArrayRegion)(JNIEnv*, jcharArray,
+                        jsize, jsize, jchar*);
+    void        (*GetShortArrayRegion)(JNIEnv*, jshortArray,
+                        jsize, jsize, jshort*);
+    void        (*GetIntArrayRegion)(JNIEnv*, jintArray,
+                        jsize, jsize, jint*);
+    void        (*GetLongArrayRegion)(JNIEnv*, jlongArray,
+                        jsize, jsize, jlong*);
+    void        (*GetFloatArrayRegion)(JNIEnv*, jfloatArray,
+                        jsize, jsize, jfloat*);
+    void        (*GetDoubleArrayRegion)(JNIEnv*, jdoubleArray,
+                        jsize, jsize, jdouble*);
+
+    /* spec shows these without const; some jni.h do, some don't */
+    void        (*SetBooleanArrayRegion)(JNIEnv*, jbooleanArray,
+                        jsize, jsize, const jboolean*);
+    void        (*SetByteArrayRegion)(JNIEnv*, jbyteArray,
+                        jsize, jsize, const jbyte*);
+    void        (*SetCharArrayRegion)(JNIEnv*, jcharArray,
+                        jsize, jsize, const jchar*);
+    void        (*SetShortArrayRegion)(JNIEnv*, jshortArray,
+                        jsize, jsize, const jshort*);
+    void        (*SetIntArrayRegion)(JNIEnv*, jintArray,
+                        jsize, jsize, const jint*);
+    void        (*SetLongArrayRegion)(JNIEnv*, jlongArray,
+                        jsize, jsize, const jlong*);
+    void        (*SetFloatArrayRegion)(JNIEnv*, jfloatArray,
+                        jsize, jsize, const jfloat*);
+    void        (*SetDoubleArrayRegion)(JNIEnv*, jdoubleArray,
+                        jsize, jsize, const jdouble*);
+
+    jint        (*RegisterNatives)(JNIEnv*, jclass, const JNINativeMethod*,
+                        jint);
+    jint        (*UnregisterNatives)(JNIEnv*, jclass);
+    jint        (*MonitorEnter)(JNIEnv*, jobject);
+    jint        (*MonitorExit)(JNIEnv*, jobject);
+    jint        (*GetJavaVM)(JNIEnv*, JavaVM**);
+
+    void        (*GetStringRegion)(JNIEnv*, jstring, jsize, jsize, jchar*);
+    void        (*GetStringUTFRegion)(JNIEnv*, jstring, jsize, jsize, char*);
+
+    void*       (*GetPrimitiveArrayCritical)(JNIEnv*, jarray, jboolean*);
+    void        (*ReleasePrimitiveArrayCritical)(JNIEnv*, jarray, void*, jint);
+
+    const jchar* (*GetStringCritical)(JNIEnv*, jstring, jboolean*);
+    void        (*ReleaseStringCritical)(JNIEnv*, jstring, const jchar*);
+
+    jweak       (*NewWeakGlobalRef)(JNIEnv*, jobject);
+    void        (*DeleteWeakGlobalRef)(JNIEnv*, jweak);
+
+    jboolean    (*ExceptionCheck)(JNIEnv*);
+
+    jobject     (*NewDirectByteBuffer)(JNIEnv*, void*, jlong);
+    void*       (*GetDirectBufferAddress)(JNIEnv*, jobject);
+    jlong       (*GetDirectBufferCapacity)(JNIEnv*, jobject);
+
+    /* added in JNI 1.6 */
+    jobjectRefType (*GetObjectRefType)(JNIEnv*, jobject);
+};
+
+34. Jni开发一些概念
+jni 开发也叫NDK开发。
+（1）：交叉编译：
+在一种平台下， 编译出 能够在 另一种平台下 运行的 二进制代码
+平台指的是：
+1.操作系统：
+Window、Linux、mac、os、solaris(java操作系统))；
+开发一般都在 Window系统；
+2.cpu(处理器)
+x86： 以86结尾的处理器
+arm处理器：
+mips处理器：
+（2）：交叉编译原理：
+（1）：源代码 编译 ====》
+（2）：生成动态连接库文件（windows下是 .dll，Dynamic link library；Linux下是 .so） ===》
+（3）：到目标平台运行（上边的windows、Linux、mac等平台）
+如果生成的 .dll、.so在不同的平台运行，运行不了。
+
+Windows系统，把代码编译成 Linux系统的、arm处理器可以执行的程序，就是交叉编译的具体过程。
+（3）：编译工具
+就是ndk工具。  能完成 windows平台下 到 Linux平台下的 具体处理器的 文件的生成，用ndk工具生成。
+
+A： ndk，native develop kits，本地开发工具集、工具包。   是一个工具链，不是一个工具， 由一系列的 工具组成，链接在一起，链式调用，组成的工具链。
+
+Windows系统的代码， 编译成c代码，生成二进制代码； 然后二进制代码再生成特定平台的动态库文件
+
+B： cdt：c/c++ develop tools： c/c++的开发工具包。  主要是让 c/c++代码 高亮显示。
+
+C： cygin：是windows平台下的，Linux系统模拟器。
+（4）：ndk工具的介绍
+android-ndk-r9、 cdt工具
+
+android-ndk-r9目录：
+
+A：build目录：
+build/tools，一系列批处理工具
+windows：下的是 .bat，批处理文件
+Linux： 下的是 .sh， 就是.shell文件
+B：docs目录：
+开发文档目录， 里边全是 .html文档，不知道怎么写，就打开文档连接来看。
+C：platforms目录：
+各种平台下， 所需要的头文件和 函数库。
+平台，有android-3、android-4、android-5、android-6.......
+
+每种平台都有3种处理器：arch-arm、arch-mips、arch-x86
+
+每一个处理器，都有自己的 头文件和函数库。
+比如arm处理器： 有include目录和lib目录。
+头文件都是以 .h结尾，在include目录下；
+动态库都是 .so，在lib目录下。如下图。
+
+
+D：prebuilt：预编译工具
+做语法的检测。
+E：samples： ndk开发示例
+
+
+后续遇到新的技术 ，就看它的 samples 的 开发案例，这个是最快的学习方式。
+F：sources： 工具的源文件
+G：tests： 测试目录
+看下 它这个 ndk开发工具有没有 bug。
+
+
+H：toolchains： 工具链
+
+
+
+I： ndk-build：编译工具。 用 ndk-build.exe来调用 toolchains的工具链
+ndk-build： 编译工具 非常重要
+
+35.ndk开发步骤：
+1.Jni开发操作数据类型：
+整型int、数组、字符串
+2：示例代码1：开发helloworld
+
+先写java
+再写 c/c++；
+最后写 jni。
+
+
+目的：在c语言中写一个方法， 获取helloworld。  在android中定义native方法，用System.loadLibrary(“hellolib”)加载 编译后生成的库文件， 这个库文件就是对c写代码的封装。
+（1）：在android中定义 native方法helloFromC，用来调用C写的 获取helloworld方法的功能
+通过 jni 调用 c语言实现的 函数， 返回给 android
+public native String helloFromC();   // 不需要参数，返回字符串helloworld
+
+（2）：在 Dev c++中写 一个获取 helloworld的方法
+#include <stdio.h> //标准的头文件
+#include <stdlib.h> // 标准的C函数库 头文件
+
+char* getHello(){
+     // 这里有可能会有很多代码，都是C/C++ 开发者写好，把方法名 getHello暴露给java，直接调用方法，
+     //然后就可以获取该方法里边的功能
+     return "hellor world from c";
+}
+
+main(){
+   printf("%s: \n", getHello());   // hello world from c
+   system("pause");
+}
+
+（3）：定义jni规范
+在android studio中 创建 hello.c文件，实现功能
+A：android studio中新建 jni目录。把 jni.h 拷贝到 jni目录
+B：在 jni目录下 创建 hello.c，代码如下：
+
+#include <jni.h> // 把jni.h头文件 导入进来后， 就可以用 jni.h 中所有的变量、方法
+
+/**
+* 在这里 实现我们需要的功能：
+    1. 拷贝 jni.h 到 jni目录
+    2. 把在 Dev c++中写好的功能拷贝到这里
+*/
+
+char* getHello(){
+
+     // 这里有可能会有很多代码，都是C/C++ 开发者写好，把方法名 getHello暴露给java，直接调用方法，
+     //然后就可以获取该方法里边的功能
+     return "hellor world from c";
+}
+
+// public native String helloFromC();
+// 在c中 要定义， java调用这个方法的 jni协议规范  jni是java和c调用的桥梁
+
+// 方法的返回类型  Java_包名_类名_方法名(JNIEnv *env, jobject obj)  固定写法，每个jni方法都需要这2个参数
+// 2个参数是 jni中间件实例化的，不是自己实例化
+jstring Java_com_czy_mycppdemo3_TestActivity_helloFromC(JNIEnv *env, jobject obj){
+
+    // jstring     (*NewStringUTF)(JNIEnv*, const char*);
+    // 返回类型jstring  函数指针(*NewStringUTF)(JNIEnv*, const char*);
+    // JNIEnv* ： 中间件， 能把 java转为c,  也可以把c转为java
+
+// 这里用右边 2种方式调用： (*env)->getVersion 、  (**env).getVersion
+    jstring str = (*env)->NewStringUTF(env, getHello());
+    return str;
+
+    // 这个是 windows 平台下的， 要用 ndk工具，把这个编译成 Linux 平台下的 能够运行的二进制 文件。就是动态库文件
+}
+C：创建 Android.mk文件，代码如下：
+LOCAL_PATH := $(call my-dir)
+include $(CLEAR_VARS)
+
+LOCAL_MODULE:=hellolib //要生成的 so库文件名称，就是在System.loadLibrary(“hellolib”)这里写的 名称， hellolib就是 编译hello.c后生成的文件，是对 hello.c的封装， java直接加载 这个 库文件就行。
+
+LOCAL_SRC_FILES:=hello.c //这个是我们写的 hello.c文件 ，然后编译后叫做 hellolib动态库，在java中加载这个库，然后调用定义的 native方法
+
+include $(BUILD_SHARED_LIBRARY)
+D：编译so
+在cmd中，或者 android studio中的 Terminal中， 用 ndk-build 命令，  编译生成hellolib.so文件，在 lib/ armeable/ hellolib.so  目录
+
+生成的so文件都是： lib开头， .so结尾，所以 这个生成的是 libhellolib.so，自己在代码中加载 动态库文件，就写 hellolib即可。
+E：在 TestActivity中 加载hellolib.so
+package com.czy.mycppdemo3;
+
+import android.app.Activity;
+import android.os.Bundle;
+
+import androidx.annotation.Nullable;
+
+public class TestActivity extends Activity {
+
+    static {
+        // 这个就是 Android.mk中的 LOCAL_MODULE:=hellolib。 因为 把 hello.c编译成so后 的名字就是 hellolib。
+        // java 调用 hellolib名字， 就能找到 hello.c代码程序
+        System.loadLibrary("hellolib");
+    }
+
+    // 目的：是从 c语言中 获取helloworld。
+    // java不能直接操作硬件， c可以。 java中定义 native方法，来调用c方法，实现java调用c
+    // 1. java中定义native方法， 调用C语言。
+    public native String helloFromC();
+
+    // 2. 写C语言，在DEV c++中写 getHello方法
+
+    // 3. 把windows下的 hello.c文件 用 ndk-build 编译成 hellolib.so库文件， 在android studio中使用
+    // java调用 hellolib库文件 就是 调用 hello.c， hellolib.so 就是封装了 hello.c
+}
+
+F：验证：在activity中 写一个 button按钮， 点击后调用 helloFromC()方法，打印日志，会输出 hello world from c
+3. ndk开发步骤总结：
+1. 创建 android 工程，写一个 native方法；
+2. 在Dev c++中写一个 hello.c文件， 实现 方法功能；
+3. 在android 中 创建jni目录；
+4. 把 jni.h 文件 拷贝到 jni 目录；
+5. 在 android 中创建 hello.c文件，实现1中的native方法 的规范
+   返回值 Java_包名_类名_方法名(JNIEnv *env，jobject obj，其他参数) // 前边2个参数是必须的；
+
+#include <jni.h> // 把jni.h头文件 导入进来后， 就可以用 jni.h 中所有的变量、方法
+/**
+* 在这里 实现我们需要的功能：
+    1. 拷贝 jni.h 到 jni目录
+    2. 把在 Dev c++中写好的功能拷贝到这里
+*/
+
+char* getHello(){
+
+     // 这里有可能会有很多代码，都是C/C++ 开发者写好，把方法名 getHello暴露给java，直接调用方法，
+     //然后就可以获取该方法里边的功能
+     return "hellor world from c";
+}
+
+// 方法的返回类型  Java_包名_类名_方法名(JNIEnv *env, jobject obj)  固定写法，每个jni方法都需要这2个参数
+jstring Java_com_czy_mycppdemo3_TestActivity_helloFromC(JNIEnv *env, jobject obj){
+
+    // jstring     (*NewStringUTF)(JNIEnv*, const char*);
+    // 返回类型jstring  函数指针(*NewStringUTF)(JNIEnv*, const char*);
+    // JNIEnv* ： 中间件， 能把 java转为c,  也可以把c转为java
+
+// 这里用右边 2种方式调用： (*env)->getVersion 、  (**env).getVersion
+    jstring str = (*env)->NewStringUTF(env, getHello());
+    return str;
+
+}
+
+6. 创建 Android.mk文件
+  LOCAL_PATH := $(call my-dir)
+include $(CLEAR_VARS)
+LOCAL_MODULE:=hellolib //要生成的 hellolib .so库文件名称，这个是对 hello.c的封装
+LOCAL_SRC_FILES:=hello.c //用c写的 hello.c文件 ，然后编译后叫做 hellolib动态库，在java中加载这个库，然后调用定义的 native方法
+include $(BUILD_SHARED_LIBRARY)
+7. 在工程 最外层目录下， 执行 ndk-build命令， 生成 hellolib.so库文件
+8. 在 java中 动态加载 hellolib.so文件：
+static {
+    // 这个就是 Android.mk中的 LOCAL_MODULE:=hellolib。 因为 把 hello.c编译成so后 的名字就是 hellolib。
+    // java 调用 hellolib名字， 就能找到 hello.c代码程序
+    System.loadLibrary("hellolib");
+}
+9. TestActivity中调用 getFromC()方法
+btnTest.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+        // 调用 helloFromC() 方法， 会打印 hello world from c
+        Toast.makeText(TestActivity.this,helloFromC(), Toast.LENGTH_LONG).show();
+    }
+});
+
+
+4. 整体代码如下： hello.c、Android.mk、jni.h都是 lib/jni目录下
+(1)：hello.c：
+#include <jni.h> // 把jni.h头文件 导入进来后， 就可以用 jni.h 中所有的变量、方法
+
+// 下边必须把 C的代码拷贝过来， 开发中，这里就是C开发工程师写好，自己光写下边的jni规范
+
+char* getHello(){
+
+     // 这里有可能会有很多代码，都是C/C++ 开发者写好，把方法名 getHello暴露给java，直接调用方法，
+     //然后就可以获取该方法里边的功能
+     return "hellor world from c";
+}
+
+
+jstring Java_com_czy_mycppdemo3_TestActivity_helloFromC(JNIEnv *env, jobject obj){
+
+// 这里用右边 2种方式调用： (*env)->getVersion 、  (**env).getVersion
+    jstring str = (*env)->NewStringUTF(env, getHello());
+    return str;
+}
+(2)：Android.mk文件：
+LOCAL_PATH := $(call my-dir)
+include $(CLEAR_VARS)
+LOCAL_MODULE:=hellolib //要生成的 so库文件名称
+LOCAL_SRC_FILES:=hello.c //这个是我们写的 hello.c文件 ，然后编译后叫做 hellolib动态库，在java中加载这个库，然后调用定义的 native方法
+include $(BUILD_SHARED_LIBRARY)
+
+Android.mk中： 写的是 hello.c文件。 不是 hello.cpp文件。 还有创建的文件也是 hello.c，不是 hello.cpp
+
+
+(3)：jni.h 是c语言自己的头文件，里边包含所有 hello.c文件中 能够调用的所有的方法，可以百度搜索
+(4)：TestActivity类
+package com.czy.mycppdemo3;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+
+public class TestActivity extends Activity {
+    static {
+        // 这个就是 Android.mk中的 LOCAL_MODULE:=hellolib。 因为 把 hello.c编译成so后 的名字就是 hellolib。
+        // java 调用 hellolib名字， 就能找到 hello.c代码程序
+        System.loadLibrary("hellolib");
+    }
+
+    // 目的：是从 c语言中 获取helloworld。
+    // java不能直接操作硬件， c可以。 java中定义 native方法，来调用c方法，实现java调用c
+    // 1. java中定义native方法， 调用C语言。
+    public native String helloFromC();
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_test);
+
+        Button btnTest = findViewById(R.id.btnTest);
+        btnTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 调用 helloFromC() 方法， 会打印 hello world from c
+                Toast.makeText(TestActivity.this,helloFromC(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+}
+5.  int类型 —— 示例代码2：两个数相加
+（1）：AddActivity类中 定义 native 方法
+public class AddActivity extends Activity {
+
+    // 1. java中定义 native 方法
+    public native int add(int a, int b);
+}
+（2）：在 Dev c++中 新建 add.c文件，写一个 add()方法。
+#include <stdio.h>
+#include <stdlib.h>
+
+// a + b
+int add(int a, int b){
+    return a+b;
+}
+
+main(){
+   system("pause");
+}
+（3）：把 jni.h 拷贝到 jni目录
+（4）：在 studio中 创建 add.c文件。
+#include <jni.h>
+
+// a + b ————》  复制 C语言写的方法
+int add(int a, int b){
+    return a+b;
+}
+
+// JNIEnv *env, jobject obj 固定参数；   后边的 jint a, jint b 2个参数
+jint Java_com.czy.mycppdemo3_AddActivity_add(JNIEnv *env, jobject obj, jint a, jint b){
+    return add(a, b);
+}
+
+（5）：创建 Android.mk文件， 这里都用的是 MyCppDemo，所以用同一个 Android.mk
+（6）：在 cmd中 进入 项目目录， 用 ndk-build，编译 addlib.so，目录在 jni/libs/armeabi/libaddlib.so
+
+（7）：在 AddActivity中 加载 addlib.so文件
+static {
+    System.loadLibrary("addlib");
+}
+（8）：在 AddActivity中 调用 add方法验证
+
+btnAdd.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+        int result = add(3 ,5);
+        Toast.makeText(AddActivity.this, "result："+result, Toast.LENGTH_LONG).show();
+    }
+});
+
+AddActivity整体代码如下：
+package com.czy.mycppdemo3;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+
+/**
+ * java 调用 c， 中定义的 add(a, b)方法
+ */
+public class AddActivity extends Activity {
+
+    static {
+        System.loadLibrary("addlib");
+    }
+
+    // 1. java中定义 native 方法
+    public native int add(int a, int b);
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_add);
+
+        Button btnAdd = findViewById(R.id.btnAdd);
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int result = add(3 ,5);
+                Toast.makeText(AddActivity.this, "result："+result, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+}
+36. javah 命令生成头文件
+自己电脑：
+
+在cmd或者studio的 Terminal， 进入代码下的 app/src/main/java目录， 用 javah 包名.类名、    javah -jni 包名.类名   都可以， 生成 .h文件，这个就是 jni规范
+
+37.Android.mk 和 Application.mk作用：
+（1）：Android.mk：
+LOCAL_PATH := $(call my-dir)
+include $(CLEAR_VARS)
+
+#要生成的 so库文件名称，本身以 lib开头，.so结尾，自动生成的全称是： libhellolib.so，自己在activity中 动态调用用的是  hellolib即可， 去掉前缀和后缀。
+LOCAL_MODULE:=hellolib
+
+#这个是studio中定义的 hello.c文件 ，编译后叫做 hellolib动态库，就是上边的 hellolib库文件，  该库文件就是封装的 hello.c。  所以在java中加载这个库，然后调用定义的 native方法就行， 不用关注 hello.c 文件。
+LOCAL_SRC_FILES:=hello.c
+include $(BUILD_SHARED_LIBRARY)
+
+上边是固定写法， 直接在项目中用就行。只要把  hellolib   和   hello.c  修改为自己项目名称即可
+
+（2）：Application.mk：
+# 设置编译后生成的库文件存放的路径
+APP_ABI := armeabi-v7a    #表示 生成 lib/ arm平台下的so
+APP_ABI := x86        #表示 生成 lib/ x86平台下的so
+APP_ABI := mips       #表示 生成 lib/ mips平台下的so
+APP_ABI := armeabi  armeabi-v7a  x86 mips  #表示 生成这几个平台下的so
+APP_ABI := all   #表示 生成所有平台下的so文件
+
+上边是固定写法， 直接在项目中用就行。
+38.工具开发ndk步骤
+（1）：配置 ndk工具
+（2）：创建android工程
+（3）：把cpp文件改为c，同时在 Android.mk中也把 cpp改为 c
+（4）：在studio中 定义 native方法；
+（5）：在DEV c++中写 c代码的功能；
+（6）：在 android的 hello.c中，把（5）写的功能复制过来，然后用命令生成头文件，这个头文件就是  jni规范。 然后复制到 hello.c中
+（7）：然后实现 （6）的方法， 就是调用 （5）中写的c代码功能
+（8）：在activity中  加载 hellolib.so文件
+（9）：写button测试按钮，调用 native方法，验证
+39.工具开发ndk
+int类型
+示例2：对 int数组中的每个值+1
+整体代码如下：
+(1)：在 Dev c++中写功能： 对int数组中每个值+1
+
+// 对数组中的每个值  +1
+void addArray(int* datas, int length){
+     int i=0;
+     for(; i<length; i++){
+         datas[i]++;
+     }
+}
+
+
+main(){
+   int arr[] = {21,22,23,24};
+   addArray(arr,4);
+   printf("%d\n", arr[2]); // 24，  因为 addArray方法是 对每个数组+1
+   system("pause");
+}
+(2)：在android中的activity中 定义同名方法 native的 addArray()方法
+// 对int数组中的 每个值 +1   数组, 数组长度
+public native void addDatas(int[] datas, int length);
+(3)：在 代码下的 app/src/main/java目录， 用 javah 包名.类名或者 javah -jni 包名.类名 ， 生成头文件
+JNIEXPORT void JNICALL Java_com_czy_mycppdemo3_SortActivity_addDatas
+  (JNIEnv *, jobject, jintArray, jint);
+(4)：在android项目的 hello.c中，把 c++写的功能复制过来，然后写jni规范：
+#include <jni.h> // 把jni.h头文件 导入进来后， 就可以用 jni.h 中所有的变量、方法
+
+/**
+* 在这里 实现我们需要的功能：
+    1. 拷贝 jni.h 到 jni目录
+    2. 把在 Dev c++中写好的功能拷贝到这里
+    3. 写 jni规范
+*/
+
+// 对数组中的每个值  +1
+void addArray(int* datas, int length){
+     int i=0;
+     for(; i<length; i++){
+         datas[i]++;
+     }
+}
+
+
+// 在Terminal的 E:\project\MyCppDemo3\app\src\main\java目录
+// 用 javah 包名.类名  生成的 头文件，复制过来 JNIEXPORT 和 JNICALL没用，可以删除
+// jintArray：是c语言中的数组，这里需要先把 java的int数组 转为 c的数组
+
+JNIEXPORT void JNICALL Java_com_czy_mycppdemo3_SortActivity_addDatas
+  (JNIEnv *env, jobject obj, jintArray jArray, jint length){
+
+  // 返回 jint类型数组，指针类型： jint* (*GetIntArrayElements)(JNIEnv*, jintArray, jboolean*);
+  //   jboolean* 是c语言中的 unsigned char， 给0就行 ， 0表示 不拷贝数组， 直接把数组拿出来就行，这里 返回 jint类型 数组
+      jint* jintArray = (*env)->GetIntArrayElements(env, jArray, 0);
+      addArray(jintArray, length);
+ }
+(5)：在TestActivity中 加载 hellolib.so文件，并验证
+public class SortActivity extends Activity {
+
+    // 加载 hellolib.so文件
+    static {
+        System.loadLibrary("hellolib");
+    }
+
+    // 对int数组中的 每个值 +1   数组, 数组长度
+    public native void addDatas(int[] datas, int length);
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_sort);
+
+        Button btnArray = findViewById(R.id.btnArray);
+        btnArray.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int[] datas = {11,12,13,14};
+                addDatas(datas, datas.length);
+                Toast.makeText(SortActivity.this, "1的位置："+datas[0], Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+}
+
+40.插入排序 - 数组
+示例代码：比较java和C的插入排序的运行时间。
+1：java的写法：
+public class SortActivity extends Activity {
+    private static final String TAG = "SortActivity";
+
+    public void init(int[] datas){
+        for (int i=0; i<datas.length; i++){
+            // 100以内随机数
+            datas[i] = (int)Math.random()*100;
+        }
+    }
+    /**
+     * 插入排序
+     */
+    public void insertSort(int[] datas){
+        // 插入排序的外层循环，插入排序的次数
+        for (int i=1; i<datas.length; i++){
+            int temp = datas[i];
+            int j=0;
+            for (j=i-1; j>0; j--){
+                if (datas[j] > temp) {
+                    // 把j的位置 放到后边，就是 j+1
+                    datas[j+1] = datas[j];
+                } else {
+                    datas[j+1] = temp;
+                    break;//跳出循环
+                }
+            }
+            if (j == -1) {
+                datas[0] = temp;
+            }
+        }
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_sort);
+
+        // 创建10个数据
+        int[] datas = new int[30000];
+        // 初始化100以内随机数
+        init(datas);
+        printData(datas);// 排序之前打印数据
+        insertSort(datas); // 排序
+        printData(datas);// 排序之后打印数据
+
+// 排序之前：13,40,24,68,58,46,21,37,72,96
+// 排序之后：13,21,24,37,40,46,58,68,72,96
+
+    }
+
+    private void printData(int[] data){
+        for (int i=0; i<data.length; i++) {
+            Log.i(TAG, data[i]+", ");
+        }
+        Log.i(TAG, "-----------------");
+    }
+
+}
+2：c的写法：
+（1）：先在 DEV c++中写好 插入排序算法：
+// 插入排序算法
+void insertSort(int* datas, int length){
+     // 插入排序的外层循环，插入排序的次数
+     int i=0;
+        for (i=1; i<length; i++){
+            int temp = datas[i];
+            int j=0;
+            for (j=i-1; j>0; j--){
+                if (datas[j] > temp) {
+                    // 把j的位置 放到后边，就是 j+1
+                    datas[j+1] = datas[j];
+                } else {
+                    datas[j+1] = temp;
+                    break;//跳出循环
+                }
+            }
+            if (j == -1) {
+                datas[0] = temp;
+            }
+        }
+}
+（2）：把c写好的这个方法， 复制到 hello.c文件中，并且写jni规范
+#include <jni.h> // 把jni.h头文件 导入进来后， 就可以用 jni.h 中所有的变量、方法
+
+/**
+* 在这里 实现我们需要的功能：
+    1. 拷贝 jni.h 到 jni目录
+    2. 把在 Dev c++中写好的功能拷贝到这里
+    3. 写 jni规范
+*/
+
+// 插入排序算法
+void insertSort(int* datas, int length){
+     // 插入排序的外层循环，插入排序的次数
+     int i=0;
+        for (i=1; i<length; i++){
+            int temp = datas[i];
+            int j=0;
+            for (j=i-1; j>0; j--){
+                if (datas[j] > temp) {
+                    // 把j的位置 放到后边，就是 j+1
+                    datas[j+1] = datas[j];
+                } else {
+                    datas[j+1] = temp;
+                    break;//跳出循环
+                }
+            }
+            if (j == -1) {
+                datas[0] = temp;
+            }
+        }
+}
+
+// 插入排序 jni规范
+ JNIEXPORT void JNICALL Java_com_czy_mycppdemo3_SortActivity_insertSort
+   (JNIEnv *env, jobject obj, jintArray jArray, jint length){
+       // 这里原则就是： 把参数的类型 转为 j开头的类型， j开头对应的就是 java的类型， 不知道的方法可以在 jni.h中查看
+    jint* jintArray = (*env)->GetIntArrayElements(env, jArray, 0);
+    insertSort(jintArray, length);
+  }
+（3）：在 SortActivity中，加载 hellolib.so库文件，定义 native方法，然后调用 此native方法验证
+package com.czy.mycppdemo3;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+
+public class SortActivity extends Activity {
+    private static final String TAG = "SortActivity";
+
+    // 加载 hellolib.so文件
+    static {
+        System.loadLibrary("hellolib");
+    }
+
+    // c的插入排序
+    public native void insertData(int[] datas, int length);
+
+    public void init(int[] datas){
+        for (int i=0; i<datas.length; i++){
+            // 100以内随机数
+            datas[i] = (int)Math.random()*100;
+        }
+    }
+    /**
+     * 插入排序
+     */
+    public void insertSort(int[] datas){
+        // 插入排序的外层循环，插入排序的次数
+        for (int i=1; i<datas.length; i++){
+            int temp = datas[i];
+            int j=0;
+            for (j=i-1; j>0; j--){
+                if (datas[j] > temp) {
+                    // 把j的位置 放到后边，就是 j+1
+                    datas[j+1] = datas[j];
+                } else {
+                    datas[j+1] = temp;
+                    break;//跳出循环
+                }
+            }
+            if (j == -1) {
+                datas[0] = temp;
+            }
+        }
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_sort);
+
+        // 创建10个数据
+        int[] datas = new int[30000];
+        // 初始化100以内随机数
+        init(datas);
+        printData(datas);// 排序之前打印数据
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG, "排序之前的时间： "+new Date());
+		//insertSort(datas); // 排序
+		insertData(datas, datas.length);
+		printData(datas);// 排序之后打印数据
+		Log.i(TAG, "排序之后的时间： "+new Date());
+
+            }
+        }).start();
+
+        // 排序之前：79,82,73,32,39,26,14,76,73,75
+        // 排序之后：14,26,32,39,73,73,75,76,79,82
+    }
+
+    private void printData(int[] data){
+        for (int i=0; i<data.length; i++) {
+            Log.i(TAG, data[i]+", ");
+        }
+        Log.i(TAG, "-----------------");
+    }
+
+}
+
+
+
+C执行插入排序：7秒
+Java执行插入排序：16秒
+
+所以，涉及到 高性能问题、运行效率问题，就用 c写好，然后用java调用c会更高效。
+
+
+ndk常用类型：整数、数组、字符串
+41.常见错误分析
+1.Caused by: java.lang.UnsatisfiedLinkError：Couldn’t load hellolib: findLibrary return null。
+原因:1：平台不匹配。
+
+在 studio编译的 lib/arm/hellolib.so  文件，只能在 arm系统手机或者模拟器运行，不能在 x86手机或者模拟器运行，会报错。错误信息：
+
+
+Ndk开发生成的 so文件，默认是 arm平台的， 下边可以设置 生成所有平台的so。
+在 lib下 再新建一个 Application.mk文件，内容写：
+
+# 设置编译后生成的库文件存放的路径
+APP_ABI := armeabi-v7a    #表示 生成 lib/ arm平台下的so
+APP_ABI := x86        #表示 生成 lib/ x86平台下的so
+APP_ABI := mips       #表示 生成 lib/ mips平台下的so
+APP_ABI := armeabi  armeabi-v7a  x86 mips  #表示 生成这几个平台下的so
+APP_ABI := all   #表示 生成所有平台下的so文件
+
+
+设置Application.mk之后， 就可以把 studio的 代码 运行到 arm、x86、mips等平台的手机或者模拟器都可以。   —————— 这个就是 交叉编译。
+
+原因2：动态加载的 库文件 单词写错，比如少写一个 o：
+static {
+    System.loadLibrary("helllib");
+}
+
+2.Caused by:  java.lang.UnsatisfiedLinkError:  addarray;  AndroidRuntime :  at com.xxx.sort.TestActivity.addarray(Native method)
+手写 studio中的  hello.c中的  jni规范写错, native 方法报错。
+
+Jni开发作用：
+（1）：用户名加密、加密算法，反编译编译不到
+（2）：安全：反编译后，代码看不懂，加密的
+（3）：效率：上边的插入排序，c的是7秒， java是 16秒
+
+42. int数组
+示例3：美图秀秀 —— 修改int数组的像素点
+1. 思路如下：
+
+
+从相册选择一张图片，对图片进行美化操作，比如点击特效设置背景，背景变化如下：
+
+
+
+
+原理就是： 对原图片转换后的一个 整型数组的 像素点进行操作。
+
+把图片放到最大，每一个小的点， 都是像素点。 图片放大后就是由像素点组成。如下：
+
+
+整数类型是 4个字节，一个字节存放透明度， 另外3个字节存放红绿蓝颜色。所以一个整数类型 就能描述一个像素点。 所以 对图片的操作，就是对 像素点的操作。
+
+像素点 是一个 整数类型的数组， 用c语言可以修改整数类型的数组。
+2.准备工作：
+3.反编译 美图秀秀
+工具： 安卓逆向助手。
+解压后，点击 工具， 选择 源文件mtxx.apk， 还需要 mtxx_dex2jar.jar文件。这2个是本来就有的。  目标文件选择 dex转jar，点击操作。
+
+
+反编译成功后：会出现如下窗口
+
+
+出现Jni， 就知道美图秀秀是 用c代码写的，编译的 so库，让 java通过jni调用c来实现， so看不了源代码，但是可以把 so拿过来自己用。
+
+可以看到 JNI类中，全部是用 整型数组 来操作 像素点。
+4.直接 把  mtxx.apk 解压，成 mtxx文件夹
+下载好压解压工具。  直接 解压到 mtxx\文件夹了， 该文件夹是如下目录：
+
+
+在 lib / armeabi / libmtimage-jni.so 有这个 so文件。
+5.代码实现
+1. 新建android项目， 直接把armeabi 包拷贝到 lib下，   armeabi / libmtimage-jni.so文件 。
+相当于就有 .so文件了。
+
+ =====》     上边getHello示例： 在DEV c++工具中写好功能方法（如getHello()）、在android中新建 hello.c文件、把 c中写好的功能复制到hello.c中、然后写 修改功能方法 jni规范，所有的操作就是为了生成 一个 .so， 这里直接有现成的 so。就不用做这些操作了。
+
+ =====》    可以直接在 activity中 写 native方法。 然后在 代码中调用 native方法。
+adb push xxx.png /sdcard/xxx.png： push 图片到 模拟器的 sdcard中。
+2. 把 反编译后的 JNI的类拷贝到 自己项目中，包名和 人家包名一定要一样，否则找不到类。
+
+
+
+3. 直接在 studio中 调用 JNI类中的方法，不用定义 native 方法， 因为 已经在 JNI类中全部定义好了
+代码如下：
+
+package com.czy.mycppdemo3;
+
+import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.Image;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
+
+import androidx.annotation.Nullable;
+
+import com.mt.mtxx.image.JNI;
+
+public class MtxxActivity extends Activity {
+
+    // 动态加载 mtimage-jni文件, 文件格式都是： lib开头， .so结尾，
+    // 这里不用写前边的这2个，直接写 mtimage-jni即可
+    static {
+        System.loadLibrary("mtimage-jni");
+    }
+
+    private ImageView iv_mtxx;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_mtxx);
+
+        iv_mtxx = findViewById(R.id.iv_mtxx);
+        // 获取图片
+        iv_mtxx.setImageBitmap(BitmapFactory.decodeFile("/sdcard/1.jpg"));
+    }
+
+    /**
+     * 样式1：
+*   修改图片的样子，就是修改像素点。 就是整型数组
+     *   1. 获取图片的像素点 = 宽*高
+     */
+    public void style1(View view){
+        // 1. 获取模拟器的 图片
+        Bitmap bitmap1 = BitmapFactory.decodeFile("/sdcard/1.jpg");
+        // 2. 获取图片的像素， 像素是 整形数组组成。
+        // 要定义数组，就得先获取 图片的宽高组成
+        int width = bitmap1.getWidth();
+        int height = bitmap1.getHeight();
+        // 3. 定义像素点的数组，把图片的宽高放进去
+        // 把图片bitmap1的像素点 ，全部放到 pixels数组中
+        int[] pixels = new int[width * height];
+
+        // getPixels()： 像素数组
+        // 参数1：存放像素的数组pixels； 参数2：从0开始； 参数3：大小要>=width: 参数4、5：都是0； 参数6、7就是图片的宽高
+        bitmap1.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        // 4. 用JNI， 改变pixels数组
+        JNI jni = new JNI();
+        // 设置图像的样式：   参数1：像素数组 ；参数2、3： 宽高
+        jni.StyleLomoB(pixels, width, height);
+
+        // 修改像素后， 创建新的图片 并返回。
+        bitmap1 = Bitmap.createBitmap(pixels, width, height, bitmap1.getConfig());
+        iv_mtxx.setImageBitmap(bitmap1);
+    }
+
+// 样式2：
+    public void style2(View view){
+        // 1. 获取模拟器的 图片
+        Bitmap bitmap1 = BitmapFactory.decodeFile("/sdcard/1.jpg");
+        // 2. 获取图片的像素， 像素是 整形数组组成。
+        // 要定义数组，就得先获取 图片的宽高组成
+        int width = bitmap1.getWidth();
+        int height = bitmap1.getHeight();
+        // 3. 定义像素点的数组，把图片的宽高放进去
+        // 把图片bitmap1的像素点 ，全部放到 pixels数组中
+        int[] pixels = new int[width * height];
+
+        // getPixels()： 像素数组
+        // 参数1：存放像素的数组pixels； 参数2：从0开始； 参数3：大小要>=width: 参数4、5：都是0； 参数6、7就是图片的宽高
+        bitmap1.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        // 4. 用JNI， 改变pixels数组
+        JNI jni = new JNI();
+        // 设置图像的样式：   参数1：像素数组 ；参数2、3： 宽高
+        jni.StyleLomoC(pixels, width, height);
+
+        // 修改像素后， 创建新的图片 并返回。
+        bitmap1 = Bitmap.createBitmap(pixels, width, height, bitmap1.getConfig());
+        iv_mtxx.setImageBitmap(bitmap1);
+    }
+}
+
+
+
+4. 开发经验
+实际开发中，如果一个功能做不出来，在网上找了一个没有源码，但是有 apk，就把 apk反编译， 有源码就看源码，没有就看 jni。 直接把 JNI类拷贝到自己项目的  lib目录下，然后加载这个 mtimage-jni.so文件， 调用 JNI 里边定义的方法 自己用。
+
+实际开发中就是 ，先实现功能，其他的再说，不管是自己做的还是在网上找的。只要是完成功能为目标。不用考虑其他的， 有时间再研究， 如果你技术再厉害，功能做不出来，都是0.  人家技术再差，只要能按时交货，就可以了。
+43.字符串 —— 实现：工商银行的 客户端登录
+1：思路：
+实现：工商银行的 客户端登录。
+用户名和密码在 c的代码中 校验，用 jni校验，登录是否成功，否则编译源码后就知道了
+
+上边的mtxx案例，只能用so，不知道so怎样写的，现在目标是要知道so里边怎样写的。
+2：步骤如下：
+（1）：IcbcActivity类：
+（2）：在 studio中 创建 icbc.c、Android.mk文件
+   修改Android.mk 中的 名字 为 icbc.c。
+（3）：在DEV c++中写好 校验用户名、密码代码；
+（4）：然后把c写好的代码，拷贝到studio的 icbc.c文件中，这里是 hello.c，并修改jni规范；
+      修改规范在 项目的app/src/main/java目录下，用 javah -jni 包名.类名生成 .h文件，com_czy_mycppdemo3_IcbcActivity.h
+然后把 规范拷贝到 icbc.c文件中修改。 这里因为在一个项目中，所以就直接用 hello.c文件， Android.mk也用一个。
+
+（5）：在 hello.c 文件中， 需要自己写 把 java字符串 转为 c的字符串，这个是最难的。 然后在 jni规范中 把 java字符串的 用户名和密码转为 c的字符串。  然后调用拷贝过来 在c中写好的 checkLogin方法。
+（6）：在 IcbcActivity中验证： 加载 hellolib库文件。 然后点击 登录按钮 调用 本地的 native方法 checkLogin即可
+3. 代码如下：
+（1）：在DEV c++中写好 checkLogin方法：
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// 校验用户名和密码字符串 登录， c中的字符串用 char* name表示
+int checkLogin(char* name, char* pwd){
+
+    // 表示2个字符串相等
+    if(strcmp(name, "andy") == 0){
+        // 上边的用户名成功，这里就判断密码是否一样
+        if(strcmp(pwd, "123")==0){
+             return 200;
+        }else {
+              return 500;
+        }
+    } else{
+        // 2个字符串不一样
+       return 404;
+    }
+}
+
+
+main(){
+   // 这里验证 用户名、密码，应该是访问服务器的。 这里省略，直接在本地校验
+   char* name = "andy1";
+   char* pwd = "123";
+   int res = checkLogin(name, pwd);
+   // andy-123   返回200；  andy1-123 返回404
+   printf("校验结果：%d\n", res);
+
+   system("pause");
+}
+（2）：在jni目录，定义 Android.mk、Application.mk文件，由于这里是一个工程，所以所有功能 都用同样的 Android.mk、Application.mk，如下：
+统一都是： hellolib库文件 、 armeabi-v7a平台（可以修改为all，生成全部平台都可以）
+Android.mk：
+LOCAL_PATH := $(call my-dir)
+include $(CLEAR_VARS)
+#要生成的 so库文件名称
+LOCAL_MODULE:=hellolib
+#这个是我们写的 hello.c文件 ，然后编译后叫做 hellolib动态库，在java中加载这个库，然后调用定义的 native方法
+LOCAL_SRC_FILES:=hello.c
+include $(BUILD_SHARED_LIBRARY)
+
+Application.mk：
+# 设置编译后生成的库文件存放的路径
+APP_ABI := armeabi-v7a
+
+（3）：在 IcbcActivity中 加载hellolib库文件、定义 native 方法
+static {
+    System.loadLibrary("hellolib");
+}
+
+/**
+ * 判断是否登录成功  ——————————————  这个用 c语言 实现
+ * @param name  用户名
+ * @param password 密码
+ * @return     404：用户名不存在； 200：登录成功 500：密码错误
+ */
+public native int checkLogin(String name, String password);
+（4）：在 studio的 Terminal中，进入 app/src/main/java 目录下，用 javah -jni 包名.类名 命令， 会自动生成 一个 .h文件，这里有 jni规范
+（5）：把DEV c++中的 c代码， 复制到studio中的 hello.c，代码如下：
+#include <jni.h> // 把jni.h头文件 导入进来后， 就可以用 jni.h 中所有的变量、方法
+
+/**
+* 在这里 实现我们需要的功能：
+    1. 拷贝 jni.h 到 jni目录
+    2. 把在 Dev c++中写好的功能拷贝到这里
+    3. 写 jni规范，进入项目的 app/src/main/java 目录下，用 javah -jni 包名.类名 命令， 会自动生成 一个 .h文件， 然后打开.h文件，  直接把 里边 生成好的 jni规范拷贝到这里的 hello.c 文件中，  然后自己在 该规范中实现 逻辑。
+比如这里在Java_com_czy_mycppdemo3_IcbcActivity_checkLogin中：
+	把 java的字符串转为 c的字符串
+
+这里的操作都是： 把java的数据类型 转为 c的数据类型。比如：
+	把 java字符串 转为 c的字符串
+把 java 数组 转为 c的数组
+把 java 整数类型 转为 c的整数类型
+*/
+
+// 校验用户名和密码字符串 登录， c中的字符串用 char* name表示
+int checkLogin(char* name, char* pwd){
+    // 表示2个字符串相等
+    if(strcmp(name, "andy") == 0){
+        // 上边的用户名成功，这里就判断密码是否一样
+        if(strcmp(pwd, "123")==0){
+             return 200;
+        }else {
+              return 500;
+        }
+    } else{
+        // 2个字符串不一样
+       return 404;
+    }
+}
+
+
+// java字符串 转为 c 字符串
+char* string_java2c(JNIEnv *env,jstring name){
+    //1.
+    jclass clazz =  (*env)->FindClass(env,"java/lang/String");
+    //2. jmethodID   (*GetMethodID)(JNIEnv*, jclass, const char*, const char*);
+    jmethodID mid = (*env)->GetMethodID(env,clazz,"getBytes","(Ljava/lang/String;)[B");
+    //3.jobject     (*CallObjectMethod)(JNIEnv*, jobject, jmethodID, ...);
+    jbyteArray jba = (*env)->CallObjectMethod(env,name,mid,(*env)->NewStringUTF(env,"utf-8"));
+    //4.jbyte*      (*GetByteArrayElements)(JNIEnv*, jbyteArray, jboolean*);
+    jbyte* jb = (*env)->GetByteArrayElements(env,jba,JNI_FALSE);
+    //5.jsize       (*GetArrayLength)(JNIEnv*, jarray);
+    jint len = (*env)->GetArrayLength(env,jba);
+    char m[10];
+
+    if (len == 0){
+       return "";
+    }
+    char *str = malloc(len + 1);
+    memcpy(str,jb,len);
+    str[len] = 0;
+   // 5.void        (*ReleaseByteArrayElements)(JNIEnv*, jbyteArray,jbyte*, jint)
+    (*env)->ReleaseByteArrayElements(env,jba,jb,0);
+    return str;
+ }
+
+
+
+// 校验用户名、密码是否正确  JNIEXPORT、JNICALL 可以删除，有没有都可以
+JNIEXPORT jint JNICALL Java_com_czy_mycppdemo3_IcbcActivity_checkLogin
+  (JNIEnv *env, jobject jobj, jstring name, jstring pwd){
+    // jni中最难的就是： 把 java的字符串  ——  转为 c的字符串
+    char* cname = string_java2c(env, name);
+    char* cpwd = string_java2c(env, pwd);
+
+    return checkLogin(cname, cpwd);
+ }
+（6）：IcbcActivity代码，点击登录，调用 本地 native方法如下：
+/**
+ * 工商银行的 客户端登录。
+ *      用 jni校验，否则编译源码后就知道了
+ */
+public class IcbcActivity extends Activity {
+
+    static {
+        System.loadLibrary("hellolib");
+    }
+
+    /**
+     * 判断是否登录成功  ——————————————  这个用 c语言 实现
+     * @param name  用户名
+     * @param password 密码
+     * @return     404：用户名不存在； 200：登录成功 500：密码错误
+     */
+    public native int checkLogin(String name, String password);
+
+    private EditText et_name, et_password;
+    private Button login;
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_icbc);
+
+        et_name = findViewById(R.id.et_name);
+        et_password = findViewById(R.id.et_password);
+        login = findViewById(R.id.login);
+
+        // 点击登录，把用户名和密码 传递给 native方法
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String name = et_name.getText().toString().trim();
+                String password = et_password.getText().toString().trim();
+
+	       // 这里直接调用 本地 登录方法
+                int result = checkLogin(name, password);
+                switch (result){
+                    case 200:
+                        Toast.makeText(IcbcActivity.this, "登录成功", Toast.LENGTH_LONG).show();
+                         break;
+                    case 404:
+                        Toast.makeText(IcbcActivity.this, "用户名不存在", Toast.LENGTH_LONG).show();
+                        break;
+                    case 500:
+                        Toast.makeText(IcbcActivity.this, "密码错误", Toast.LENGTH_LONG).show();
+                        break;
+                }
+            }
+        });
+    }
+}
+
+
+44.在studio的 Terminal中，用命令生成的 .h文件解析
+如下：com_czy_mycppdemo3_TestActivity.h 。
+
+是 在 studio的 Terminal中，cd 进入到项目的 app/src/main/java目录下， 用 javah -jni 包名.类名 生成的 com_czy_mycppdemo3_TestActivity.h文件，生成的所有内容如下：
+/* DO NOT EDIT THIS FILE - it is machine generated */
+#include <jni.h>
+/* Header for class com_czy_mycppdemo3_TestActivity */
+
+#ifndef _Included_com_czy_mycppdemo3_TestActivity
+#define _Included_com_czy_mycppdemo3_TestActivity
+#ifdef __cplusplus
+extern "C" {
+#endif
+/*
+ * Class:     com_czy_mycppdemo3_TestActivity
+ * Method:    helloFromC
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_czy_mycppdemo3_TestActivity_helloFromC
+  (JNIEnv *, jobject);
+
+#ifdef __cplusplus
+}
+#endif
+#endif
+
+以上都是用命令 自动生成的 .h文件 ， 自己只要把 红色的 jni规范拷贝到 hello.c文件中使用即可， 其余的 都不用关系是啥意思。
+
+
+
+
+
+
+45.C和 java的特点
+1. 特点：
+C：性能高、安全
+Java：做界面容易，
+
+C调用 java，主要是调用界面的。  c调java 是一种反射。 反射原理就是 jni。
+C实现不了 界面，只能是java 写好界面， c来调用java。 比如发送短信，只能是java写好，c写不了。
+
+2. 反射示例：
+代码如下：
+
+A：Person类如下：
+
+public class Person {
+    private static final String TAG = "Person";
+
+    // 唱歌
+    public void sing(String gequ){
+        Log.i(TAG, "正在唱歌： "+gequ);
+    }
+}
+B：AppReflect类如下：
+public class AppReflect extends Activity {
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_app_reflect);
+        /*// 正常调用：
+        Person person = new Person();
+        person.sing("小苹果");*/
+
+        // 反射调用：
+        try {
+            // 1. 获取Class对象
+            Class<?> clazz = Class.forName("com.czy.mycppdemo3.Person");
+            // 2. 获取方法名 sing，  参数1：方法名； 参数2：方法参数，数组
+            Method method = clazz.getDeclaredMethod("sing", new Class[]{String.class});
+            // 3. 创建对象obj
+            Object obj = clazz.newInstance();
+            // 4. 调用  方法.对象（正常是：对象.方法）
+            method.invoke(obj, new String[]{"小苹果"});
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+46. 序列化和反序列化
+1. 序列化：Serializable
+
+
+Serializable 空接口，没有方法，表示对象序列化。 意思就是： 如果一个对象很大，有10M大数据， 而网络带宽只有2M，根本传递不过去，只能把10M对象拆分传递，拆分的过程叫做 序列化。
+
+传递完成，然后再组装数据，组装成这个对象， 叫反序列化。
+
+就像搬家一样，床太大，只能拆分开来拿， 叫序列化；  搬家完成后，再组装，叫反序列化。
+
+47. 方法签名
+在 cmd中 用  javap -s java.lang.String。 如下，比如看 valueOf方法签名：
+
+
+（[C）Ljava/lang/String;  表示
+
+（）：括号表示参数，做参数签名， 无参直接是 （）
+[：表示数组
+C： 表示 char字符类型
+L： 表示返回的是 类类型 L开头， 分号；结束。  中间是 java/lang/String
+
+方法签名： 签的是 方法参数 和 返回值。
+
+方法有重载，方法签名确定唯一的方法。
+
+public void closeMessage(){} ——> 签名就是 ()V
+()表示没有参数； 后边的V 是返回类型，是void类型。
+
+只有构造方法没有返回类型， 其他方法都有返回类型。
+
+47.C调用java
+1：显示弹窗
+（1）：思路：
+改版 工商银行 客户端登录
+
+上边是： toast是在 android中弹出，
+现在是： android 写好 showMessage方法， 在hello.c中调用，是c调用showMessage方法。:
+（2）：代码如下：
+A：IcbcActivity代码如下：
+/**
+ * 改版的 ————  工商银行的 客户端登录。
+ *      把验证结果的 toast删掉。  这些 toast在c中实现。
+ *      用c调用 java
+ */
+public class IcbcActivity2 extends Activity {
+    static {
+        System.loadLibrary("hellolib");
+    }
+
+    /**
+     * 判断是否登录成功  ——————————————  这个用 c语言 实现
+     */
+    public native int checkLogin(String name, String password);
+
+    // 显示和隐藏对话框，都是java的，  现在需要 c来调用 java 的界面功能。
+    // 这里是  c 调用 showMessage， 在c中来显示对话框
+    // 显示对话框
+    public void showMessage(String msg) {
+        if (pd != null) {
+            pd.dismiss();
+        }
+        pd = new ProgressDialog(this);
+        pd.setTitle("正在处理");
+        // 传递过来的msg :  比如 用户名正在加密、密码正在加密
+        pd.setMessage(msg);
+        pd.show();
+    }
+
+    // 关闭对话框
+    public void closeMessage(){
+        if (pd != null) {
+            pd.dismiss();
+        }
+    }
+
+    private EditText et_name, et_password;
+    private Button login;
+    private ProgressDialog pd;
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_icbc);
+
+        et_name = findViewById(R.id.et_name);
+        et_password = findViewById(R.id.et_password);
+        login = findViewById(R.id.login);
+
+        // 点击登录，把用户名和密码 传递给 native方法
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String name = et_name.getText().toString().trim();
+                String password = et_password.getText().toString().trim();
+                checkLogin(name, password);
+            }
+        });
+    }
+}
+B：hello.c代码如下：
+#include <jni.h> // 把jni.h头文件 导入进来后， 就可以用 jni.h 中所有的变量、方法
+
+/**
+* 在这里 实现我们需要的功能：
+    1. 拷贝 jni.h 到 jni目录
+    2. 把在 Dev c++中写好的功能拷贝到这里
+    3. 写 jni规范
+*/
+
+// 校验用户名和密码字符串 登录， c中的字符串用 char* name表示
+int checkLogin(char* name, char* pwd){
+    // 表示2个字符串相等
+    if(strcmp(name, "andy") == 0){
+        // 上边的用户名成功，这里就判断密码是否一样
+        if(strcmp(pwd, "123")==0){
+             return 200;
+        }else {
+              return 500;
+        }
+    } else{
+        // 2个字符串不一样
+       return 404;
+    }
+}
+
+
+// --------- 然后这里 C 回调 java -------------------
+void c_Show(JNIEnv *env, jobject jobj, char* msg){
+    // 1. 获取Class类型对象    c把字符串 传递到 java中， 用反射。
+    // jclass (*FindClass)(JNIEnv*, const char*); 参数1：env； 参数2：类名
+    jclass clazz = (*env)->FindClass(env, "com/czy/mycppdemo3/IcbcActivity2");
+
+    // 2. 获取方法名
+   // jmethodID   (*GetMethodID)(JNIEnv*, jclass, const char*, const char*);
+
+   // 参数3：java中的方法名，这里是showMessage；
+   // 参数4：showMessage方法的签名  在cmd中用  javap -s java.lang.String，查找方法签名
+   //   public void showMessage(String msg){} (Ljava/lang/String;)V
+   //                         L开头, 分号结尾, 中间是参数类型，void返回值是V
+   jmethodID method = (*env)->GetMethodID(env, clazz, "showMessage", "(Ljava/lang/String;)V");
+
+    // 3. 创建对象obj,  就是 IcbcActivity2， 就是这里的 obj参数。
+
+
+// 把 c字符串 转为 java的字符串jstring
+    // jstring (*NewStringUTF)(JNIEnv*, const char*);
+    jstring str = (*env)->NewStringUTF(env, msg);
+
+
+    // 4. 调用  方法.对象（正常是：对象.方法）
+    // void  (*CallVoidMethod)(JNIEnv*, jobject, jmethodID, ...);
+    // 参数2：obj对象，就是 IcbcActivity2；参数3：方法签名method；
+    // 参数4：参数，是可变参数，方法输入的参数， 这里只有一个字符串 String
+
+    (*env)->CallVoidMethod(env, obj, method, str);
+}
+
+ // ---------- 这里 先是 java 调用 C
+ // Java_com_czy_mycppdemo3_IcbcActivity_checkLogin--------
+
+// 改版 ————  java写好弹窗Dialog， c来调用
+// 校验用户名、密码是否正确  JNIEXPORT、JNICALL 可以删除，有没有都可以
+JNIEXPORT jint JNICALL Java_com_czy_mycppdemo3_IcbcActivity_checkLogin
+  (JNIEnv *env, jobject jobj, jstring name, jstring pwd){
+    // jni中最难的就是： 把 java的字符串  ——  转为 c的字符串
+    char* cname = string_java2c(env, name);
+    char* cpwd = string_java2c(env, pwd);
+
+    int result = checkLogin(cname, cpwd);
+
+    // 根据 result，设置字符串，就是 用户名正在加密处理、密码正在加密处理、登录成功等字符串。
+    // 把这个 msg传递给java的 showMessage方法，showMessage自己处理这个字符串
+    char* msg = "用户名正在加密处理";
+
+    // --------- 然后这里 C 回调 java -------------------
+    c_Show(env, obj, msg);
+
+    // checkLogin上边写的方法，在c里边校验 登录结果， 把int结果返回给java
+    return checkLogin(cname, cpwd);
+ }
+C：验证结果：
+
+
+
+2. 隐藏弹窗
+（1）：思路
+同样是， java写一个 closeMessage方法， 然后在 c中调用java的 closeMessage方法。   弹窗显示 2s后， 消失。 c语言、jni中的 时间是秒， sleep(2)：表示休息2s。
+（2）：代码如下：
+A：hello.c 代码：
+// c调用java的 closeMessage方法
+void c_Close(JNIEnv *env, jobject jobj){
+   // 1. 获取Class类型对象
+   // jclass (*FindClass)(JNIEnv*, const char*); 参数1：env； 参数2：类名
+   jclass clazz = (*env)->FindClass(env, "com/czy/mycppdemo3/IcbcActivity2");
+
+    // 2. 获取方法名   ()V  --->
+    // 括号里边的是 参数，无参就是() .  括号外边的 V是返回类型， 是void， 构造方法没有返回类型
+    // jmethodID   (*GetMethodID)(JNIEnv*, jclass, const char*, const char*);
+    jmethodID method = (*env)->GetMethodID(env, clazz, "closeMessage", "()V");
+
+    // 3. 创建对象obj
+
+    // 4. 调用  方法.对象（正常是：对象.方法）
+    // void  (*CallVoidMethod)(JNIEnv*, jobject, jmethodID, ...);
+    (*env)->CallVoidMethod(env, obj, method);
+}
+
+JNIEXPORT jint JNICALL Java_com_czy_mycppdemo3_IcbcActivity_checkLogin
+  (JNIEnv *env, jobject jobj, jstring name, jstring pwd){
+    // jni中最难的就是： 把 java的字符串  ——  转为 c的字符串
+    char* cname = string_java2c(env, name);
+    char* cpwd = string_java2c(env, pwd);
+
+    int result = checkLogin(cname, cpwd);
+
+    // 根据 result，设置字符串，就是 用户名正在加密处理、密码正在加密处理、登录成功等字符串。
+    // 把这个 msg传递给java的 showMessage方法，showMessage自己处理这个字符串
+    char* msg = "用户名正在加密处理";
+
+    // --------- 然后这里 C 回调 java c_Show -------------------
+    c_Show(env, obj, msg);
+
+    // dialog显示后，休息2s，然后关闭dialog
+    c_Close(env, obj);
+
+    // checkLogin上边写的方法，在c里边校验 登录结果， 把int结果返回给java
+    return checkLogin(cname, cpwd);
+ }
+B：IcbcActivity2 代码：
+public class IcbcActivity2 extends Activity {
+    static {
+        System.loadLibrary("hellolib");
+    }
+
+    /**
+     * 判断是否登录成功  ——————————————  这个用 c语言 实现
+     */
+    public native int checkLogin(String name, String password);
+
+    // 显示和隐藏对话框，都是java的，  现在需要 c来调用 java 的界面功能。
+    // 这里是  c 调用 showMessage， 在c中来显示对话框
+    // 显示对话框
+    public void showMessage(String msg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (pd != null) {
+                    pd.dismiss();
+                }
+                pd = new ProgressDialog(IcbcActivity2.this);
+                pd.setTitle("正在处理");
+                // 传递过来的msg :  比如 用户名正在加密、密码正在加密
+                pd.setMessage(msg);
+                pd.show();
+            }
+        });
+    }
+
+    // 关闭对话框
+    public void closeMessage(){
+        if (pd != null) {
+            pd.dismiss();
+        }
+    }
+
+    private EditText et_name, et_password;
+    private Button login;
+    private ProgressDialog pd;
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_icbc);
+
+        et_name = findViewById(R.id.et_name);
+        et_password = findViewById(R.id.et_password);
+        login = findViewById(R.id.login);
+
+        // 点击登录，把用户名和密码 传递给 native方法
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String name = et_name.getText().toString().trim();
+                String password = et_password.getText().toString().trim();
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+     // java调用c:  checkLogin 调用 c的 Java_com_czy_mycppdemo3_IcbcActivity_checkLogin方法，
+    // c调用java： 然后在 c的 Java_com_czy_mycppdemo3_IcbcActivity_checkLogin方法中 又调用java的 closeMessage方法
+                        checkLogin(name, password);
+                    }
+                }).start();
+            }
+        });
+    }
+}
+
+48. C调用java2
+1.对登录的用户名加密
+对 hello.c 的 checkLogin校验登录的用户名和密码方法 中， 转换后的 cname加密。
+1：思路如下：
+A：在 DEV c++中写好 void jiami(char* name)方法后，然后把方法拷贝到 studio中的 hello.c文件中；
+
+B：在 studio的 IcbcActivity2中写一个 setName() 方法， 在c中调用 setName方法， 把加密后的name回显到 java中。
+
+这个是 c 调用 java
+2：代码如下：
+（1）：在 IcbcActivity中写 回显方法  setName
+/**
+ * java写好方法， 让c调用。 就是 c 调用 java
+ */
+public void setName(String name){
+    runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+            et_name.setText(name);
+        }
+    });
+}
+（2）：在 hello.c 中，写jiami方法
+
+// 要加密的 字符串
+ void jiami(char *str,int len){
+      int i = 0;
+      for (; i < len;i++){
+          str[i]++; // 比如是a，++后会变成 b
+      }
+ }
+
+（3）：在 checkLogin校验 用户名密码后， 让 c 调用 c_showName，此方法里边 调用的是 java的 setName
+
+//  java写好弹窗Dialog， c来调用
+JNIEXPORT jint JNICALL Java_com_czy_mycppdemo3_IcbcActivity_checkLogin
+  (JNIEnv *env, jobject jobj, jstring name, jstring pwd){
+    // jni中最难的就是： 把 java的字符串  ——  转为 c的字符串
+    char* cname = string_java2c(env, name);
+    char* cpwd = string_java2c(env, pwd);
+
+    // 上边定义的方法
+    int result = checkLogin(cname, cpwd);
+    char* msg = "用户名正在加密处理";
+
+    // --------- 然后这里 C 回调 java c_Show -------------------
+    c_Show(env, obj, msg);
+
+   // 加密
+    jiami(cname, strlen(cname));
+
+    // java中写 setName方法， c 调用 java的 setName方法。 然后在 该方法回显 加密后的name
+    // 此处的 cname 是 加密后的名字
+    c_showName(env, obj, cname);
+
+   // 休息2s， c原因以秒为单位。
+   sleep(2);
+
+    // dialog显示后，休息2s，然后关闭dialog
+    c_Close(env, obj);
+
+    // checkLogin上边写的方法，在c里边校验 登录结果， 把int结果返回给java
+    return checkLogin(cname, cpwd);
+ }
+（4）： c_showName 这个方法里边，是 c 调用的 java的 setName方法
+// c 调用 java的 setName方法，把name传递给 setName，在activity中回显到输入框中
+void c_showName(JNIEnv *env, jobject jobj, char* name){
+    // 1. 获取Class类型对象
+    jclass clazz = (*env)->FindClass("com/czy/mycppdemo3/IcbcActivity2");
+
+    // 2. 获取method  方法名
+    // jmethodID   (*GetMethodID)(JNIEnv*, jclass, const char*, const char*);
+    jmethodID method = (*env)->GetMethodID(env, clazz, "setName", "(Ljava/lang/String;)V");
+
+    // 3. 创建对象obj,  就是 IcbcActivity2， 这里就是 obj对象
+
+    // 4. 调用  方法.对象（正常是：对象.方法）
+    // void  (*CallVoidMethod)(JNIEnv*, jobject, jmethodID, ...);
+
+    // 把 c字符串 转为 java的字符串jstring
+    // jstring (*NewStringUTF)(JNIEnv*, const char*);
+    jstring str = (*env)->NewStringUTF(env, name);
+
+    (*env)->CallVoidMethod(env, obj, method, str);
+}
+
+（5）：验证
+输入的 用户名是 abc，2秒后 变为 bcd
+
+
+49.java和c调用总结：
+1：java调用c：
+就是在 hello.c 中写 的所有的 jni规范的方法，都是给java调用的，比如：
+
+jstring Java_com_czy_mycppdemo3_TestActivity_helloFromC(JNIEnv *env, jobject obj){
+
+    // jstring     (*NewStringUTF)(JNIEnv*, const char*);
+    // 返回类型jstring  函数指针(*NewStringUTF)(JNIEnv*, const char*);
+    // JNIEnv* ： 中间件， 能把 java转为c,  也可以把c转为java
+
+// 这里用右边 2种方式调用： (*env)->getVersion 、  (**env).getVersion
+    jstring str = (*env)->NewStringUTF(env, getHello());
+    return str;
+
+}
+
+
+2：C调用 java：
+示例1：用的是反射， 4个步骤，如上的 c_Close
+A：java中写一个 closeMessage方法：
+// c调用这个方法 ，就会让 弹窗消失
+public void closeMessage(){
+    if (pd != null) {
+        pd.dismiss();
+    }
+}
+B：在 c 中调用
+如下： 用反射：
+
+// c调用java的 closeMessage方法
+void c_Close(JNIEnv *env, jobject jobj){
+   // 1. 获取Class类型对象
+   // jclass (*FindClass)(JNIEnv*, const char*); 参数1：env； 参数2：类名
+   jclass clazz = (*env)->FindClass(env, "com/czy/mycppdemo3/IcbcActivity2");
+
+    // 2. 获取方法名   ()V  --->
+    // 括号里边的是 参数，无参就是() .  括号外边的 V是返回类型， 是void， 构造方法没有返回类型
+    // jmethodID   (*GetMethodID)(JNIEnv*, jclass, const char*, const char*);
+    jmethodID method = (*env)->GetMethodID(env, clazz, "closeMessage", "()V");
+
+    // 3. 创建对象obj
+
+    // 4. 调用  方法.对象（正常是：对象.方法）
+    // void  (*CallVoidMethod)(JNIEnv*, jobject, jmethodID, ...);
+    (*env)->CallVoidMethod(env, obj, method);
+}
+示例2： c 调用java中的 setName
+A：在 java 中定义 setName方法
+/**
+ * java写好方法， 让c调用。 就是 c 调用 java
+C 调用 setName时，把name传递过来，setText 把 结果 回显到 这里。
+ */
+public void setName(String name){
+    runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+            et_name.setText(name);
+        }
+    });
+}
+
+B：在 c 中调用 java的 setName 方法
+// c 调用 java的 setName方法，把name传递给 setName，在activity中回显到输入框中
+void c_setname(JNIEnv *env, jobject jobj, char* name){
+    // 1. 获取Class类型对象
+    jclass clazz = (*env)->FindClass("com/czy/mycppdemo3/IcbcActivity2");
+
+    // 2. 获取method  方法名
+    // jmethodID   (*GetMethodID)(JNIEnv*, jclass, const char*, const char*);
+    jmethodID method = (*env)->GetMethodID(env, clazz, "setName", "(Ljava/lang/String;)V");
+
+    // 3. 创建对象obj,  就是 IcbcActivity2， 这里就是 obj对象
+
+    // 4. 调用  方法.对象（正常是：对象.方法）
+    // void  (*CallVoidMethod)(JNIEnv*, jobject, jmethodID, ...);
+
+    // 把 c字符串 转为 java的字符串jstring
+    // jstring (*NewStringUTF)(JNIEnv*, const char*);
+    jstring str = (*env)->NewStringUTF(env, name);
+
+    (*env)->CallVoidMethod(env, obj, method, str);
+}
+示例3：c 调用java的 showDialog方法
+A：在 java中定义 showDialog方法：
+// 这里是让  c 调用 showMessage， 在c中来显示对话框
+// 显示对话框
+public void showMessage(String msg) {
+    runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+            if (pd != null) {
+                pd.dismiss();
+            }
+            pd = new ProgressDialog(IcbcActivity2.this);
+            pd.setTitle("正在处理");
+            // 传递过来的msg :  比如 用户名正在加密、密码正在加密
+            pd.setMessage(msg);
+            pd.show();
+        }
+    });
+}
+B：在 c中调用 showDialog方法
+JNIEXPORT jint JNICALL Java_com_czy_mycppdemo3_IcbcActivity_checkLogin
+  (JNIEnv *env, jobject jobj, jstring name, jstring pwd){
+    // jni中最难的就是： 把 java的字符串  ——  转为 c的字符串
+    char* cname = string_java2c(env, name);
+    char* cpwd = string_java2c(env, pwd);
+
+    // 上边定义的方法
+    int result = checkLogin(cname, cpwd);
+
+    // 根据 result，设置字符串，就是 用户名正在加密处理、密码正在加密处理、登录成功等字符串。
+    // 把这个 msg传递给java的 showMessage方法，showMessage自己处理这个字符串
+    char* msg = "用户名正在加密处理";
+
+    // --------- 然后这里 C 回调 java c_Show -------------------
+    c_Show(env, obj, msg);
+// checkLogin上边写的方法，在c里边校验 登录结果， 把int结果返回给java
+return checkLogin(cname, cpwd);
+}
+
+
+
+// c调用java的 showMessage方法
+void c_Show(JNIEnv *env, jobject jobj, char* msg){
+    // 1. 获取Class类型对象    c把字符串 传递到 java中， 用反射。
+    // jclass (*FindClass)(JNIEnv*, const char*); 参数1：env； 参数2：类名
+    jclass clazz = (*env)->FindClass(env, "com/czy/mycppdemo3/IcbcActivity2");
+
+    // 2. 获取方法名
+   // jmethodID   (*GetMethodID)(JNIEnv*, jclass, const char*, const char*);
+
+   // 参数3：java中的方法名，这里是showMessage；
+   // 参数4：showMessage方法的签名  在cmd中用  javap -s java.lang.String，查找方法签名
+   //   public void showMessage(String msg){} (Ljava/lang/String;)V
+   //                         L开头, 分号结尾, 中间是参数类型，void返回值是V
+   jmethodID method = (*env)->GetMethodID(env, clazz, "showMessage", "(Ljava/lang/String;)V");
+
+    // 3. 创建对象obj,  就是 IcbcActivity2， 就是这里的 obj参数。
+
+    // 4. 调用  方法.对象（正常是：对象.方法）
+    // void  (*CallVoidMethod)(JNIEnv*, jobject, jmethodID, ...);
+    // 参数2：obj对象，就是 IcbcActivity2；参数3：方法签名method；
+    // 参数4：参数，是可变参数，方法输入的参数， 这里只有一个字符串 String
+
+    // 把 c字符串 转为 java的字符串jstring
+    // jstring (*NewStringUTF)(JNIEnv*, const char*);
+    jstring str = (*env)->NewStringUTF(env, msg);
+
+    (*env)->CallVoidMethod(env, obj, method, str);
+}
+
+50. C的字符串 转为 java
+比如： 从 c中获取 hello world from c
+jstring Java_com_czy_mycppdemo3_TestActivity_helloFromC(JNIEnv *env, jobject obj){
+    // jstring     (*NewStringUTF)(JNIEnv*, const char*);
+    // 返回类型jstring  函数指针(*NewStringUTF)(JNIEnv*, const char*);
+//  2种方式调用： (*env)->getVersion 、  (**env).getVersion
+    jstring str = (*env)->NewStringUTF(env, getHello());
+    return str;
+}
+
+51. Java的字符串 转为 c的字符串
+1.思路：
+// java 调用 c功能：我java给 你c 传递一个字符串 andy，
+// 你c 给我字符串前边加一个 hello，然后返回给我
+2.代码如下：
+1. 在 Java2CActivity中定义 一个 native方法，String getHelloFromC(String name)。给c传递一个 字符串， 然后 C再 返回给 java一个字符串
+// java 调用 c功能：我java给 你c 传递一个字符串，
+// 你c 给我字符串前边加一个 hello，然后返回给我
+public native String getHelloFromC(String name);
+2. 在DEV c++中的 java2c字符串.c文件中写好方法： 获取拼接hello的字符串：
+#include <stdio.h>
+#include <stdlib.h>
+
+
+// java给c传递一个 字符串，c给前边加一个 hello，然后返回给我
+char* getHelloName(char* name, int length){
+      // char[] str ; 这种方式申请内存获取不到值，所以一般都用 malloc申请内存空间。
+      // 动态申请空间  ——————
+      // 只要是 malloc动态申请内存， 一定要乘以 对应类型的 个数 sizeof(char)、sizeof(int)等。
+      char* res = malloc((6 + length + 1) * sizeof(char)); // 6是hello:   1是\0
+
+      // 申请好空间后， c工程师 把hello拼接到 传递过来的 字符串前边
+      // 字符串： 先拷贝再拼接。
+
+      // 要给前边 拼接的 字符串
+      char* helloStr = "hello:";
+
+      // 先把 hello 拷贝给 res 这块内存
+      strcpy(res, helloStr);
+      // 字符串拼接： 把hello 拼接到 res前边
+      strcat(res, name);
+      return res;
+}
+
+
+main(){
+    char* name = "andy";
+    name = getHelloName(name, strlen(name));
+    printf("%s\n", name);   // hello:andy
+    system("pause");
+}
+3. 把 c++写好的 这个方法 复制到  studio中的  hello.c 文件中：
+// java给c传递一个 字符串，c给前边加一个 hello，然后返回给我
+char* getHelloName(char* name, int length){
+      // char[] str ; 这种方式申请内存获取不到值，所以一般都用 malloc申请内存空间。
+      // 动态申请空间  ——————
+      // 只要是 malloc动态申请内存， 一定要乘以 对应类型的 个数 sizeof(char)、sizeof(int)等。
+      char* res = malloc((6 + length + 1) * sizeof(char)); // 6是hello:   1是\0
+
+      // 申请好空间后， c工程师 把hello拼接到 传递过来的 字符串前边
+      // 字符串： 先拷贝再拼接。
+      // 要给前边 拼接的 字符串
+      char* helloStr = "hello:";
+      // 先把 hello 拷贝给 res 这块内存
+      strcpy(res, helloStr);
+      // 字符串拼接： 把hello 拼接到 res前边
+      strcat(res, name);
+      return res;
+}
+4. cd到 项目目录， 用 javah  -jni  包名.类名， 生成 头文件 .h文件。里边写的是 jni规范。
+JNIEXPORT jstring JNICALL Java_com_czy_mycppdemo3_Java2CActivity_getHelloFromC
+  (JNIEnv *, jobject, jstring)
+
+5. 然后把  jni规范 拷贝到 hello.c 文件中，然后在 hello.c 中写方法
+#include <jni.h> // 把jni.h头文件 导入进来后， 就可以用 jni.h 中所有的变量、方法
+#include <string.h> // strlen()获取 c的字符串长度 , 在 这个头文件里边
+#include <stdlib.h>
+
+ // java给c传递一个 字符串，c给前边加一个 hello，然后返回给我
+  char* getHelloName(char* name, int length){
+        // char[] str ; 这种方式申请内存获取不到值，所以一般都用 malloc申请内存空间。
+        // 动态申请空间  ——————
+        // 只要是 malloc动态申请内存， 一定要乘以 对应类型的 个数 sizeof(char)、sizeof(int)等。
+        char* res = malloc((6 + length + 1) * sizeof(char)); // 6是hello:   1是\0
+
+        // 申请好空间后， c工程师 把hello拼接到 传递过来的 字符串前边
+        // 字符串： 先拷贝再拼接。
+        // 要给前边 拼接的 字符串
+        char* helloStr = "hello:";
+        // 先把 hello 拷贝给 res 这块内存
+        strcpy(res, helloStr);
+        // 字符串拼接： 把hello 拼接到 res前边
+        strcat(res, name);
+        return res;
+  }
+
+/**
+* try {
+*     // 这个是 java中的正常调用，目的是这个。
+*     // 现在需要在 hello.c 中 反射调用， 是 用字符串调用它的 getBytes方法， 就是 "andy".getBytes("utf-8")
+*     byte[] b = "andy".getBytes("utf-8");
+*     } catch (UnsupportedEncodingException e) {
+*        e.printStackTrace();
+*     }
+*/
+// 把 java 字符串 转为 c的字符串
+char* java2CString(JNIEnv *env, jobject obj, jstring str){
+    LOGI("java2CString 已经开始执行了.......");
+
+        // java中的 byte[] 对应于 c中的 char* [] 字符数组
+     // 1. 获取 jclass  ——  这里是 字符串类String
+     jclass clazz = (*env)->FindClass(env, "com/czy/mycppdemo3/IcbcActivity2");
+
+     // 2. 获取 methodId  这里方法名就是 getBytes， 固定写法   [表示返回值是数组，B表示返回是bytes
+     jmethodID method = (*env)->GetMethodID(env, clazz, "getBytes", "(Ljava/lang/String;)[B");
+
+    // 3. 获取字符串， 就是 str
+
+    // 4. 调用  方法.对象（正常是：对象.方法） 下边的 jobject就是 指针
+    // jobject  (*CallObjectMethod)(JNIEnv*, jobject, jmethodID, ...);
+    jstring jstr = (*env)->NewStringUTF(env, "utf-8");
+    jbyteArray jba  = (*env)->CallObjectMethod(env, str, method, jstr);
+
+    // 5. 获取到数组array
+    // jbyte* 就是 unsigned char 无符号
+    // jbyte* (*GetByteArrayElements)(JNIEnv*, jbyteArray, jboolean*);
+    jbyte* jb = (*env)->GetByteArrayElements(env, jba, 0);
+
+    // 6. 获取数组长度 array length
+    // jsize  (*GetArrayLength)(JNIEnv*, jarray);
+    jsize length = (*env)->GetArrayLength(env, jba);
+
+    LOGI("长度length：%d\n", length);
+
+    // 7. 动态申请一块内存
+    // 字符数组
+    char* cstr = malloc(length + 1);
+    // 把 字节指针jb的内容 ， 拷贝到 字符数组cstr中
+    // 内存拷贝  参数1：目标的； 参数2：原来的； 参数3：拷贝的字串长度
+    memcpy(cstr, jb, length);
+
+    // 8. 给字符串 加 \0 结束符
+    cstr[len] = '\0';
+
+    LOGI("cstr：%s\n", cstr);
+
+    // 9. 清理jbyteArray内存   参数4：从0的位置开始
+    // void (*ReleaseByteArrayElements)(JNIEnv*, jbyteArray, jbyte*, jint);
+    (*env)->ReleaseByteArrayElements(env, jba, jb, 0);
+    return cstr;
+}
+
+// JNIEXPORT、JNICALL 可以删除
+// 1和2 都是 c写好， java直接在 这个方法里边 写下边的2步 ， 把结果返回就行了
+jstring Java_com_czy_mycppdemo3_Java2CActivity_getHelloFromC
+  (JNIEnv *env, jobject obj, jstring str){
+    // 1. 把 java 字符串 转为 c的字符串
+    char* name = java2CString(env, obj, str);
+    LOGI("name：%s\n", name);
+
+    // 2. java给c传递一个 字符串，c给前边加一个 hello，然后返回给我
+    char* result = getHelloName(name, strlen(len));
+     LOGI("result：%s\n", result);
+
+    jstring jstr = (*env)->NewStringUTF(env, result);
+    return jstr;
+}
+6. 在 Java2CActivity中写：
+public class Java2CActivity extends Activity {
+
+    static {
+        System.loadLibrary("hellolib");
+    }
+
+    // java 调用 c，  功能：我java给 你c 传递一个字符串，
+    // 你c 给我字符串前边加一个 hello，然后返回给我
+    public native String getHelloFromC(String name);
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_java2c);
+
+        try {
+            // 这个是 java中的正常调用，目的是这个。
+            // 现在需要在 hello.c 中 反射调用
+            byte[] b = "andy".getBytes("utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        // 验证方式： 点击button， 传递 andy， 然后返回给 java： hello： andy
+        Button btnStr = findViewById(R.id.btnStr);
+        btnStr.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(Java2CActivity.this, getHelloFromC("andy"), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+}
+7. 写Android.mk、Application.mk
+和上边 的 示例代码的 一样。
+8. 在 c中打印log日志
+1.复制如下到 hello.c 的最上边
+#include <android/log.h>
+#define LOG_TAG "System.out"
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+
+2.给Android.mk增加如下红色：
+LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+LOCAL_LDLIBS += -llog
+
+LOCAL_MODULE    := j2c
+LOCAL_SRC_FILES := j2c.c
+include $(BUILD_SHARED_LIBRARY)
+加了上边的2个， 就可以在 hello.c 中加 LOGI、LOGD 日志， 在控制台输出日志调试。
+
+LOGI("长度length：%d\n", length);
+LOGI("result：%s\n", result);
+
+9. 验证
+点击 activity的 按钮， 提示 hello: andy：
+
+
+52. 编码处理
+java 编码都是GBK，c都是 UTF-8，二者才能通信。因为java字符占2个字节， c的字符占一个字节。
+
+String name = “ab好cd”;
+name[0]=a; name[1]=b;   name[5]=c; name[6]=d
+
+name[3]=-70; name[4] = -61;
+
+3、4是中文的，因为中文占用2个字节。
+
+java的字符串 传递给 c，要想不乱码， 得遵守一种规范。规范就是 字符的编码
+53. 锅炉示例
+
+
+1. 原理：
+右边是压力表，压力过高，左边的阀门就会把多余的气放掉。压力减小，锅炉就不会爆炸。
+
+所以需要对 压力进行精准监控。
+
+检测锅炉压力 ====》用硬件设备，因为 c语言可以直接操作硬件。
+底部是一个活塞，中间是蒸汽，蒸汽会向下压活塞，活塞下边有弹簧，当压力过大，弹簧缩小，弹簧里边有二极管，二极管距离短了、压力和电流就不一样，电流是控制 表的刻度。
+
+c 语言读取这些数据后，传递给 手机端，手机就知道数据压力是多少，压力大了就过去不烧锅炉了，人可以在办公室用手机控制锅炉，不用大冬天来回跑到烧锅炉地方，效率也高。
+
+2. 思路：
+代码还是MyCppDemo3.  还是hellolib.c文件、Android.mk、Application.mk文件。
+上边的所有示例代码， 都是把 DEV c++写的 功能代码拷贝过来， 如果代码太多，就直接把 对应的 .c文件全部拷贝到 studio的 jni目录。 在 studio的 hello.c文件直接调用 拷贝过来的 函数名就行。
+3.代码
+1. 示例1：锅炉1：
+1.把 DEV c++中写好的 功能的 cstr.c文件全部拷贝到 studio 的 jni目录，然后在 Android.mk中 给 LOCAL_SRC_FILES 后边再添加一个 cstr.c。
+1.目的是 可以在studio中自己的  hello.c 文件中 直接用 cstr.c 文件的方法。
+
+2.LOCAL_PATH := $(call my-dir)
+include $(CLEAR_VARS)
+
+#打印log需要添加如下
+LOCAL_LDLIBS += -llog
+
+#要生成的 so库文件名称
+LOCAL_MODULE:=hellolib
+#这个是我们写的 hello.c文件 ，然后编译后叫做 hellolib动态库，在java中加载这个库，然后调用定义的 native方法
+LOCAL_SRC_FILES:=hello.c cstr.c
+
+include $(BUILD_SHARED_LIBRARY)
+
+如果DEV c++写了很多个 .c文件， 照样全部拷贝到 studio中的 jni目录。 然后 在 Android.mk 中 添加所有的 .c文件， 空格隔开。
+
+2.在 studio的 GuoluActivity，定义 native方法， 获取压力的方法、加载库文件。
+public class GuoluActivity extends Activity {
+
+    // 动态加载库文件
+    static {
+        System.loadLibrary("hellolib");
+    }
+
+    // 定义native方法 获取锅炉的压力
+    public native int getPressValue();
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_guolu);
+        Button btnGetPress = findViewById(R.id.btnGetPress);
+        btnGetPress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int pressValue = getPressValue();
+                Toast.makeText(GuoluActivity.this, "压力值："+pressValue,Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+}
+
+3.在 studio的 Terminal中，进入 app/src/main/java目录， 用 javah -jni 包名.类名生成 jni规范
+JNIEXPORT jint JNICALL Java_com_czy_mycppdemo3_guolu_GuoluActivity_getPressValue
+  (JNIEnv *, jobject);
+4.然后把 规范拷贝到 hello.c 文件中，然后直接在上边规范方法中调用 cstr.c中的方法
+#include <jni.h> // 把jni.h头文件 导入进来后， 就可以用 jni.h 中所有的变量、方法
+#include <string.h> // strlen()获取 c的字符串长度 , 在 这个头文件里边
+#include <stdlib.h>
+
+
+// java 调用c， 获取压力值  JNIEXPORT和JNICALL可以删除
+JNIEXPORT jint JNICALL Java_com_czy_mycppdemo3_guolu_GuoluActivity_getPressValue
+  (JNIEnv *env, jobject jobj) {
+
+        // 把 DEV c++ 写的 功能 cstr.c文件拷贝到 jni目录，这里直接调用 cstr.c文件中方法就行
+        return getRandNumbe();
+  }
+
+5.点击 获取压力按钮，弹出 获取 cstr.c中的 压力值
+
+2. 示例2：锅炉2：用进度条实现
+1. 定义 GuoluActivity2 中定义 native方法
+开始监控、停止监控的button、进度条Seekbar。
+2个native方法，开始监控 和 停止监控。
+
+点击开始监控按钮，就用java调用 c的开始监控 startMonitor；
+点击停止监控 就调用 native方法 c的停止监控 stopMonitor。
+
+ // 获取 hello.c 中的 压力值
+ public native int getPressValue();
+
+ // 开始监控 ，  java 要调用 c的方法， 用c实现，因为 c可以获取到压力值
+ public native void startMonitor();
+ // 结束监控 ，  java 要调用 c的方法
+ public native void stopMonitor();
+
+2. studio的 Terminal中，cd app/src/main/java，用 javah -jni 包名.类名 生成 jni规范。
+JNIEXPORT void JNICALL Java_com_czy_mycppdemo3_guolu_GuoluActivity2_startMonitor
+  (JNIEnv *, jobject);
+
+JNIEXPORT void JNICALL Java_com_czy_mycppdemo3_guolu_GuoluActivity2_stopMonitor
+  (JNIEnv *, jobject);
+
+3.把 jni规范 拷贝到  hello.c文件。然后写功能。
+思路：
+A：定义 boolean state=0;  0是false； 其余是true。
+B：开始监控的时候， state=1。 每隔一秒返回一次压力值，是一个死循环；在点击停止监控，state=0，就是停止监控
+
+#include <jni.h> // 把jni.h头文件 导入进来后， 就可以用 jni.h 中所有的变量、方法
+#include <string.h> // strlen()获取 c的字符串长度 , 在 这个头文件里边
+#include <stdlib.h>
+
+
+
+
+int state;  //0是false；  其余都是true
+
+
+// 开始监控 ：  c语言实现开始监控
+// 在while死循环中，首先调用 c的获取压力值。 然后 在用 c调用java的 setMyProgress方法， 把 压力值显示到 java页面上。
+
+JNIEXPORT void JNICALL Java_com_czy_mycppdemo3_guolu_GuoluActivity2_startMonitor
+  (JNIEnv *env, jobject jobj) {
+        state = 1; // 开始监控
+        while(state) {
+            // 1. c中 获取到锅炉的压力值
+            int press = getRandNumber();
+
+            // 2. c调用 java， 调用 setMyProgress显示 当前压力值
+            // A: 获取 Class
+            jclass clazz = (*env)->FindClass(env, "com/czy/mycppdemo3/guolu/GuoluActivity2");
+            // B: 获取方法 method  参数3：方法名； 参数4：方法签名。 参数是int，返回值是void
+            jmethodID methodId = (*env)->GetMethodID(env, clazz, "setMyProgress", "(I)V");
+            // C：创建obj，上边参数的 obj
+            // D. 调用  方法.对象（正常是：对象.方法）
+            // jobject  (*CallObjectMethod)(JNIEnv*, jobject, jmethodID, ...);
+            (*env)->CallVoidMethod(env, obj, methodId, press);
+
+            // 每隔1秒返回一个压力值
+            sleep(1);
+        }
+  }
+
+// 停止监控  让上边的 死循环停止
+JNIEXPORT void JNICALL Java_com_czy_mycppdemo3_guolu_GuoluActivity2_stopMonitor
+  (JNIEnv *env, jobject jobj){
+        state = 0;  // 就停止监控
+  }
+4.在GuoluActivity2中实现的代码：
+public class GuoluActivity2 extends Activity {
+
+    // 动态加载 库文件
+    static {
+        System.loadLibrary("hellolib");
+    }
+
+    // 获取 hello.c 中的 压力值
+    public native int getPressValue();
+
+    // 开始监控 ，  java 要调用 c的方法， 用c实现，因为 c可以获取到压力值
+    public native void startMonitor();
+    // 结束监控 ，  java 要调用 c的方法
+    public native void stopMonitor();
+
+    private SeekBar seekbar;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_guolu2);
+
+        Button btnStart = findViewById(R.id.btnStart);
+        Button btnStop = findViewById(R.id.btnStop);
+        seekbar = findViewById(R.id.seekbar);
+        seekbar.setMax(100);
+
+        btnStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 点击开始监控，不停的调用 c的方法，获取信息
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        startMonitor();
+                    }
+                }).start();;
+            }
+        });
+
+        btnStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 停止监控，时间很短，直接停止就行
+                stopMonitor();
+            }
+        });
+    }
+
+    // 设置当前进度：c调用这个方法， 把当前压力值传递过来，在这里显示。
+    public void setMyProgress(int progress){
+        seekbar.setProgress(progress);
+    }
+}
+5.验证效果
+点击 开始监控，每隔一秒，进度条变化一次。
+
+
+
+可以在 进度条的下边， 再显示一个 压力值的文本信息。快爆炸的时候要变成红色的、发短信、放音乐的操作
+
+3. 示例3： 自定义圆柱形
+1. 思路：
+	压力值 <  50：     正常的 - 绿色，
+	50 < 压力值 < 70:  黄色预警，
+	压力值 < 90：      蓝色预警；
+	压力值 > 90：      红色预警
+
+2. 自定义view的技术点：
+1.postInvalidate： 子线程中更新UI， 会调用 onDraw，不断调用 drawText更新UI。  这里就是： setProgress源码中更新UI就是用 这个方法， 所以上边的 setMyProgress 更新UI不用在 主线程。
+
+2.子类调用 父类的方法， 父类的方法都是 protected的，只让子类调用。
+
+3.自定义view中的 宽度、高度、大小，都是像素点， 默认都是px，需要转的话可以转为 dp。
+3. 测试代码：
+（1）：自定义 锅炉压力值MyView
+ public class MyView extends View {
+    // 设置当前压力值  —— 就是圆柱的 高度
+    private int currentPress = 60;
+
+    public int getCurrentPress() {
+        return currentPress;
+    }
+
+    public void setCurrentPress(int currentPress) {
+        this.currentPress = currentPress;
+    }
+
+    public MyView(Context context) {
+        super(context);
+    }
+
+    public MyView(Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    public MyView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        Paint paint = new Paint();
+        paint.setColor(Color.RED);
+        paint.setStrokeWidth(2);
+        paint.setTextSize(20);
+
+        if (currentPress < 50) {
+            paint.setColor(Color.GREEN);
+        } else if (currentPress < 70) {
+            paint.setColor(Color.YELLOW);
+        } else if (currentPress < 90) {
+            paint.setColor(Color.BLUE);
+        } else {
+            // 到这里说明 压力值 > 90， 在这里发短信、放音乐说明 锅炉压力值太大了
+            paint.setColor(Color.RED);
+        }
+        canvas.drawRect(50, 300-currentPress,100, 300, paint);
+        canvas.drawText("当前压力值："+currentPress, 130, 270, paint);
+    }
+}
+（2）：MyViewActivity
+
+public class MyViewActivity extends Activity {
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_myview);
+    }
+}
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.czy.mycppdemo3.view.MyView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+
+</LinearLayout>
+
+
+
+（3）：验证效果如下：
+当前压力值是 60， 所以是 黄色
+
+
+4. 示例4：
+（1）：MyView代码：
+public class MyView extends View {
+    // 设置当前压力值  —— 就是圆柱的 高度
+    private int currentPress = 60;
+
+    public int getCurrentPress() {
+        return currentPress;
+    }
+
+    public void setCurrentPress(int currentPress) {
+        this.currentPress = currentPress;
+        // 在子线程中更新UI， 会调用 onDraw，根据currentPress
+        // 不断调用 drawText， 重新绘制页面
+        postInvalidate();
+    }
+
+    public MyView(Context context) {
+        super(context);
+    }
+
+    public MyView(Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    public MyView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        Paint paint = new Paint();
+        paint.setColor(Color.RED);
+        paint.setStrokeWidth(2);
+        paint.setTextSize(20);
+
+        if (currentPress < 50) {
+            paint.setColor(Color.GREEN);
+        } else if (currentPress < 70) {
+            paint.setColor(Color.YELLOW);
+        } else if (currentPress < 90) {
+            paint.setColor(Color.BLUE);
+        } else {
+            // 到这里说明 压力值 > 90， 在这里发短信、放音乐说明 锅炉压力值太大了
+            paint.setColor(Color.RED);
+        }
+        canvas.drawRect(50, 300-currentPress,100, 300, paint);
+        canvas.drawText("当前压力值："+currentPress, 130, 270, paint);
+    }
+}
+
+（2）：MyViewActivity代码：
+public class MyViewActivity extends Activity {
+
+    static {
+        System.loadLibrary("hellolib");
+    }
+
+    // java 调用 c的startMonitor，  开始监控
+    public native void startMonitor();
+
+    // java 调用 c的startMonitor，  结束监控
+    public native void stopMonitor();
+
+    private MyView myView;
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_myview);
+
+        myView = findViewById(R.id.myView);
+
+        Button btnStart = findViewById(R.id.btnStart);
+        Button btnStop = findViewById(R.id.btnStop);
+
+        btnStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 点击开始监控，不停的调用 c的方法，获取信息
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        startMonitor();
+                    }
+                }).start();;
+            }
+        });
+
+        btnStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 停止监控，时间很短，直接停止就行
+                stopMonitor();
+            }
+        });
+    }
+
+    /**
+     *  hello.c 中获取到 压力值后， c调用java。
+     *  调用 java的 setMyProgress方法，在这里更新压力值
+     *
+     * @param progress hello.c 获取到的压力值
+     */
+    public void setMyProgress(int progress) {
+        if (progress > 90) {
+            //  大于90，可以发送短信、播放音乐
+        }
+        myView.setCurrentPress(progress);
+    }
+}
+
+（3）：验证效果：
+点击开始监控， 矩形框颜色不断变化。
+
+
+54.卸载软件监听
+1.背景
+android  中想卸载一个软件，卸载后提示 卸载的原因，输入然后提交。 这个是 c 写的，其余语言写 卸载不干净。 卸载不了的软件都是用 c 写的， 用 c 的 分叉进程。
+
+分叉进程：一个进程 分叉成 多个进程
+
+就像外国人吃牛排：
+一块牛排，4个人，都拿一个叉子吃， 这样一块牛排就可以4个人都能吃。  相当于把一个 进程分叉成 4个进程，这样，每个进程 就可以 独立的干事了。
+
+2.思路
+1.还是用 hellolib.c文件、Android.mk、Application.mk
+3. 代码
+1. 第一版：客户卸载app，c的日志还在打印
+（1）：定义 XieZaiActivity，定义 native方法 shabusi()， 用c实现，java调用 c
+// 定义native方法， 用c来实现，  java 调用 c
+public native void shabusi();
+
+（2）：在studio 的 Terminal目录下，执行 javah 包名.类名，生成 .h文件
+JNIEXPORT void JNICALL Java_com_czy_mycppdemo3_xiezai_XieZaiActivity_shabusi
+  (JNIEnv *, jobject);
+（3）：把这个 jni规范， 拷贝到 hello.c 文件中。
+#include <jni.h> // 把jni.h头文件 导入进来后， 就可以用 jni.h 中所有的变量、方法
+#include <string.h> // strlen()获取 c的字符串长度 , 在 这个头文件里边
+#include <stdlib.h>
+
+// c语言 打印日志， 需要添加如下， 同时给
+#include <android/log.h>
+#define LOG_TAG "System.out"
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+
+/**
+* 在这里 实现我们需要的功能：
+    1. 拷贝 jni.h 到 jni目录
+    2. 把在 Dev c++中写好的功能拷贝到这里
+    3. 把 jni规范 从.h文件拷贝过来。 写功能，这个jni方法 ， 就是  java调用c
+*/
+
+// 杀不死方法 —— 让软件卸载不了
+JNIEXPORT void JNICALL Java_com_czy_mycppdemo3_xiezai_XieZaiActivity_shabusi
+  (JNIEnv *env, jobject jobj) {
+
+      // 分叉函数  0表示成功
+      int result = fork();
+      if(result == 0) {
+          // 分叉成功
+          while(1) {
+          LOGI("===== 你卸载不掉。。。。=====");
+              // 每隔一秒钟，循环一次
+              sleep(1);
+          }
+      }
+  }
+
+（4）：XieZaiActivity如下：
+public class XieZaiActivity extends Activity {
+
+    static {
+        System.loadLibrary("hellolib");
+    }
+
+    // 定义native方法， 用c来实现，  java 调用 c
+    public native void shabusi();
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_xiezai);
+
+        // 代码一运行，就调用方法，界面不提示，后台在运行。卸载也卸载不了
+        shabusi();
+    }
+}
+
+（5）：验证运行结果：
+把app卸载 了， c 里边的 日志还在 打印。这样做很不好， 可以做成：如果客户卸载软件，可以弹出提示框，让输入原因，为什么卸载，下次可以做的更好
+
+
+上边的 PID，是分叉进程的 进程号， 在 adb shell中，直接 kill 1436就可以杀死分叉进程， c的 日志就不会打印。
+
+
+2. 第二版：
+1.如何知道软件有没有被卸载？？？
+监听文件夹。 apk安装到手机上有个目录。包名就是文件名，当包名不存在，就认为  我的 apk被用户卸载了。
+
+2.代码 和第一版 一样。
+（1）：hello.c代码：
+#include <jni.h> // 把jni.h头文件 导入进来后， 就可以用 jni.h 中所有的变量、方法
+#include <string.h> // strlen()获取 c的字符串长度 , 在 这个头文件里边
+#include <stdlib.h>
+#include <stdio.h>
+
+// c语言 打印日志， 需要添加如下， 同时给
+#include <android/log.h>
+#define LOG_TAG "System.out"
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+
+// -- 第二版 -- 用户卸载apk后，让跳转一个 qq网页，然后让用户输入为啥卸载原因，然后提交
+JNIEXPORT void JNICALL Java_com_itheima_removelistener_MainActivity_shabusi
+  (JNIEnv *env, jobject obj)
+{
+   //fork();  获取进程 拆分进程
+      int flag = 1;
+      pid_t pid = fork(); //拆分进程  pid_t：还是int类型
+      if (pid == 0) { //0拆分成功
+         while(flag) {
+            //监视文件夹是否存在。
+            //FILE *fopen(char *filename, char *type); 打开文件， rw: 打开文件的模式
+            FILE* f = fopen("/data/data/com.czy.mycppdemo3.xiezai","rw");
+            if(f==NULL) {
+               //文件不存在
+               LOGI("not exist,bei xiele");
+               //调用c代码执行一个外部命令，开启界面
+               // am: ActivityManager： activity管理者
+               // 卸载完apk后， 用 am strart -a android.intent.action.VIEW -d http://www.qq.com，
+               // 用 上边的网址 跳转到 qq页面，让用户填写卸载的原因。
+               // 下边的网址，一般就是写自己服务器的地址，跳转到自己服务器地址
+               execlp("am", "am", "start", "-a", "android.intent.action.VIEW",
+                     "-d", "http://www.qq.com", NULL);
+               // 停止打印，停止循环
+               flag = 0;
+            } else {
+               //文件存在
+               LOGI("exist");
+            }
+            sleep(1);
+         }
+      }
+}
+（2）：XieZaiActivity代码：
+package com.czy.mycppdemo3.xiezai;
+
+import android.app.Activity;
+import android.os.Bundle;
+
+import androidx.annotation.Nullable;
+
+import com.czy.mycppdemo3.R;
+
+public class XieZaiActivity extends Activity {
+
+    static {
+        System.loadLibrary("hellolib");
+    }
+
+    // 定义native方法， 用c来实现，  java 调用 c
+    public native void shabusi();
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_xiezai);
+
+        // 代码一运行，就调用方法，界面不提示，后台在运行。卸载也卸载不了
+        shabusi();
+    }
+}
+（3）：验证如下：
+只要把 卸载监听apk 卸载了，就跳转到 qq页面：让用户填写 卸载原因，提交就行
+
+55. C++实现 helloworld
+C++完全兼容C。只有一点细节不兼容。
+（1）：创建 cpp.cpp文件、Android.mk、Application.mk文件
+cpp.cpp 和 hello.c 文件一样，还是写 头文件和 jni规范，来实现 java调用c++的；
+Android.mk： 里边写 cpp.cpp，不要修改成 cpp.c
+
+Application.mk：不变。
+
+（2）：定义 CppActivity，定义 native方法， java 调用c++，方法由 c++ 实现
+// 加载动态库文件
+static {
+    System.loadLibrary("cpp");
+}
+
+// 定义native方法， java 调用 c++， 方法有 c++ 实现
+public native String helloFromCpp();
+
+（3）：在 studio的 Terminal中，cd app/src/main/java中， javah 包名.类名，生成 对应 的 .h文件
+然后要把 生成的 .h文件 拷贝到 studio的 jni目录下，同时 在 cpp.cpp文件中， 把 .h文件 引用过来， 和 引用 #include <stdio.h>一样。  再把 jni规范复制到 .cpp文件中。
+
+
+
+ c语言不用这么引用，直接把 jni规范复制过来修改就行
+
+56.c 和 c++区别：
+Jni调用时候：
+c调用：  jstring str = (*env)->NewStringUTF(env, getHello());
+c++调用：jstring str = (env)->NewStringUTF("hello from cpp");
+
+区别如下：
+
+c++ 调用：
+（1）：c++中把 *env 的 *去掉；
+（2）：c++调用函数指针时候，把方法里边参数1的  env去掉， 其他的 都不变。
+（3）：c是把 .h头文件 的jni规范复制 hello.c文件中来写功能， c++是要 把头文件复制到 studio的 jni目录下， 同时把 jni规范复制 到 .c文件。
+
+以上，是写代码时候的区别， 就变成 c++语法了。
+
+其他定义方面的区别：
+（2）：c中是结构体，C++中是类
+（3）：c中申请空间用 malloc/realloc， 删除空间 用 free 释放。
+c++ 中： 申请对象空间用 New，删除对象空间 Delete。
+（4）：c只能声明结构体，不能声明函数，c++中结构体和类 基本一致（除了几个访问权限，结构体的访问权限没有类多，仅此而已）
+
+
+
+其他区别：（了解即可）
+（1）：C++是多继承，java是单继承
+（2）：c++中 下边都是 独立的函数， C中这些是 函数指针。 下边的 箭头都是 指针调用 ：
+
+
+57. 分析jni.h 头文件里边的：
+1.#ifdef  _cplusplus  这个是 宏定义，预编译处理，c++ 语法。
+
+
+2.在java中 所有的类，都是 object的子类看，所以：
+Object o1 = 3;
+Object o2  =  new Integer();
+Object o3  =  new Object();
+Object o4  =  new int[3];
+Object o5  =  new Integer[3];
+Object o6  =  new Object[3];
+
+Object c7[] = new Object[3];
+
+上边的，全部是对的， 因为 java中  所有的类都是 object的 子类。Object声明的变量能指向 任何数据类型。
+58.jni实际开发经验
+1. 第一种开发模式
+什么都没有，java的native方法没有， c的 so文件没有， 是全新的， 需要 java 和 c开发人员 重新的去写。
+1.java 程序员定义 native方法，用 javah 包名.类名，生成jni规范。
+2.找一个 c程序员，写好 c的代码实现
+3.studio中写 hello.c、Android.mk、Application.mk
+4.在 studio的 activity中 加载库文件， 调用 native方法， 实现功能。
+2. 第二种开发模式
+1.C代码已经写好
+2.自己要根据 c代码， 来定义 jni规范，定义 native方法（参数和返回值，要和c代码对应）
+3.生成 jni规范
+4.生成 .so文件（生成具体平台下的arm、mips等平台），加载库文件，然后调用 native方法。
+3. 第三种开发模式
+1..so文件已经给你了，就是上边的示例，hmxx。
+2.拿到jni规范 —— 已经拿到 so了， 肯定有  jni规范。没有jni规范生成不了.so文件。
+3.activity 加载库文件， 然后 activity中 调用 native方法，达到 java调用 c功能，具体功能在 c 中已经实现好了。
+
+
+在大公司里边， 站在别人的肩膀上，多看看别人写的代码，再看下自己，能学习到很多东西。
+要把自己做的东西做细、做精，就行。
+
+59. 别人给你一套c代码，让你帮忙生成 .so文件做法
+（1）：uninstalled_observer.c这个是 .c文件名， 把 c代码 复制到 自己studio的 jni目录下的 这个文件：
+/* 头文件begin */
+#include <jni.h>
+#include <stdlib.h>
+ #include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/inotify.h>
+#include <sys/stat.h>
+
+#include <android/log.h>
+/* 头文件end */
+
+/* 宏定义begin */
+ //清0宏
+#define MEM_ZERO(pDest, destSize) memset(pDest, 0, destSize)
+
+//LOG宏定义
+#define LOG_INFO(tag, msg) __android_log_write(ANDROID_LOG_INFO, tag, msg)
+#define LOG_DEBUG(tag, msg) __android_log_write(ANDROID_LOG_DEBUG, tag, msg)
+#define LOG_WARN(tag, msg) __android_log_write(ANDROID_LOG_WARN, tag, msg)
+#define LOG_ERROR(tag, msg) __android_log_write(ANDROID_LOG_ERROR, tag, msg)
+/* 宏定义end */
+
+#ifndef _Included_main_activity_UninstalledObserverActivity
+#define _Included_main_activity_UninstalledObserverActivity
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#undef main_activity_UninstalledObserverActivity_MODE_PRIVATE
+#define main_activity_UninstalledObserverActivity_MODE_PRIVATE 0L
+#undef main_activity_UninstalledObserverActivity_MODE_WORLD_READABLE
+ #define main_activity_UninstalledObserverActivity_MODE_WORLD_READABLE 1L
+ #undef main_activity_UninstalledObserverActivity_MODE_WORLD_WRITEABLE
+ #define main_activity_UninstalledObserverActivity_MODE_WORLD_WRITEABLE 2L
+#undef main_activity_UninstalledObserverActivity_MODE_APPEND
+#define main_activity_UninstalledObserverActivity_MODE_APPEND 32768L
+ #undef main_activity_UninstalledObserverActivity_MODE_MULTI_PROCESS
+ #define main_activity_UninstalledObserverActivity_MODE_MULTI_PROCESS 4L
+#undef main_activity_UninstalledObserverActivity_BIND_AUTO_CREATE
+ #define main_activity_UninstalledObserverActivity_BIND_AUTO_CREATE 1L
+#undef main_activity_UninstalledObserverActivity_BIND_DEBUG_UNBIND
+ #define main_activity_UninstalledObserverActivity_BIND_DEBUG_UNBIND 2L
+#undef main_activity_UninstalledObserverActivity_BIND_NOT_FOREGROUND
+ #define main_activity_UninstalledObserverActivity_BIND_NOT_FOREGROUND 4L
+ #undef main_activity_UninstalledObserverActivity_BIND_ABOVE_CLIENT
+ #define main_activity_UninstalledObserverActivity_BIND_ABOVE_CLIENT 8L
+#undef main_activity_UninstalledObserverActivity_BIND_ALLOW_OOM_MANAGEMENT
+ #define main_activity_UninstalledObserverActivity_BIND_ALLOW_OOM_MANAGEMENT 16L
+#undef main_activity_UninstalledObserverActivity_BIND_WAIVE_PRIORITY
+ #define main_activity_UninstalledObserverActivity_BIND_WAIVE_PRIORITY 32L
+#undef main_activity_UninstalledObserverActivity_BIND_IMPORTANT
+#define main_activity_UninstalledObserverActivity_BIND_IMPORTANT 64L
+ #undef main_activity_UninstalledObserverActivity_BIND_ADJUST_WITH_ACTIVITY
+ #define main_activity_UninstalledObserverActivity_BIND_ADJUST_WITH_ACTIVITY 128L
+#undef main_activity_UninstalledObserverActivity_CONTEXT_INCLUDE_CODE
+ #define main_activity_UninstalledObserverActivity_CONTEXT_INCLUDE_CODE 1L
+#undef main_activity_UninstalledObserverActivity_CONTEXT_IGNORE_SECURITY
+ #define main_activity_UninstalledObserverActivity_CONTEXT_IGNORE_SECURITY 2L
+#undef main_activity_UninstalledObserverActivity_CONTEXT_RESTRICTED
+ #define main_activity_UninstalledObserverActivity_CONTEXT_RESTRICTED 4L
+#undef main_activity_UninstalledObserverActivity_RESULT_CANCELED
+#define main_activity_UninstalledObserverActivity_RESULT_CANCELED 0L
+ #undef main_activity_UninstalledObserverActivity_RESULT_OK
+ #define main_activity_UninstalledObserverActivity_RESULT_OK -1L
+ #undef main_activity_UninstalledObserverActivity_RESULT_FIRST_USER
+ #define main_activity_UninstalledObserverActivity_RESULT_FIRST_USER 1L
+#undef main_activity_UninstalledObserverActivity_DEFAULT_KEYS_DISABLE
+ #define main_activity_UninstalledObserverActivity_DEFAULT_KEYS_DISABLE 0L
+#undef main_activity_UninstalledObserverActivity_DEFAULT_KEYS_DIALER
+ #define main_activity_UninstalledObserverActivity_DEFAULT_KEYS_DIALER 1L
+ #undef main_activity_UninstalledObserverActivity_DEFAULT_KEYS_SHORTCUT
+ #define main_activity_UninstalledObserverActivity_DEFAULT_KEYS_SHORTCUT 2L
+#undef main_activity_UninstalledObserverActivity_DEFAULT_KEYS_SEARCH_LOCAL
+ #define main_activity_UninstalledObserverActivity_DEFAULT_KEYS_SEARCH_LOCAL 3L
+#undef main_activity_UninstalledObserverActivity_DEFAULT_KEYS_SEARCH_GLOBAL
+ #define main_activity_UninstalledObserverActivity_DEFAULT_KEYS_SEARCH_GLOBAL 4L
+
+/*
+ * Class:     main_activity_UninstalledObserverActivity
+ * Method:    init
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT int JNICALL Java_main_activity_UninstalledObserverActivity_init(JNIEnv *, jobject, jstring);
+
+#ifdef __cplusplus
+}
+#endif
+ #endif
+
+
+/* 头文件begin */
+
+/* 头文件end */
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+/* 内全局变量begin */
+static char TAG[] = "UninstalledObserverActivity.init";
+static jboolean isCopy = JNI_TRUE;
+
+static const char APP_DIR[] = "/data/data/pym.test.uninstalledobserver";
+static const char APP_FILES_DIR[] = "/data/data/pym.test.uninstalledobserver/files";
+static const char APP_OBSERVED_FILE[] = "/data/data/pym.test.uninstalledobserver/files/observedFile";
+ static const char APP_LOCK_FILE[] = "/data/data/pym.test.uninstalledobserver/files/lockFile";
+/* 内全局变量 */
+
+/*
+ * Class:     main_activity_UninstalledObserverActivity
+ * Method:    init
+ * Signature: ()V
+ * return: 子进程pid
+ */
+JNIEXPORT int JNICALL Java_main_activity_UninstalledObserverActivity_init(JNIEnv *env, jobject obj, jstring userSerial)
+{
+    jstring tag = (*env)->NewStringUTF(env, TAG);
+
+    LOG_DEBUG((*env)->GetStringUTFChars(env, tag, &isCopy)
+             , (*env)->GetStringUTFChars(env, (*env)->NewStringUTF(env, "init observer"), &isCopy));
+
+    // fork子进程，以执行轮询任务
+    pid_t pid = fork();
+    if (pid < 0)
+    {
+        LOG_ERROR((*env)->GetStringUTFChars(env, tag, &isCopy)
+                , (*env)->GetStringUTFChars(env, (*env)->NewStringUTF(env, "fork failed !!!"), &isCopy));
+
+        exit(1);
+    }
+    else if (pid == 0)
+    {
+        // 若监听文件所在文件夹不存在，创建
+        FILE *p_filesDir = fopen(APP_FILES_DIR, "r");
+         if (p_filesDir == NULL)
+         {
+            int filesDirRet = mkdir(APP_FILES_DIR, S_IRWXU | S_IRWXG | S_IXOTH);
+            if (filesDirRet == -1)
+            {
+                 LOG_ERROR((*env)->GetStringUTFChars(env, tag, &isCopy)
+                         , (*env)->GetStringUTFChars(env, (*env)->NewStringUTF(env, "mkdir failed !!!"), &isCopy));
+
+                exit(1);
+            }
+        }
+
+        // 若被监听文件不存在，创建文件
+        FILE *p_observedFile = fopen(APP_OBSERVED_FILE, "r");
+        if (p_observedFile == NULL)
+        {
+            p_observedFile = fopen(APP_OBSERVED_FILE, "w");
+        }
+        fclose(p_observedFile);
+
+        // 创建锁文件，通过检测加锁状态来保证只有一个卸载监听进程
+        int lockFileDescriptor = open(APP_LOCK_FILE, O_RDONLY);
+        if (lockFileDescriptor == -1)
+        {
+            lockFileDescriptor = open(APP_LOCK_FILE, O_CREAT);
+        }
+        int lockRet = flock(lockFileDescriptor, LOCK_EX | LOCK_NB);
+        if (lockRet == -1)
+        {
+            LOG_DEBUG((*env)->GetStringUTFChars(env, tag, &isCopy)
+                    , (*env)->GetStringUTFChars(env, (*env)->NewStringUTF(env, "observed by another process"), &isCopy));
+
+            exit(0);
+        }
+        LOG_DEBUG((*env)->GetStringUTFChars(env, tag, &isCopy)
+                    , (*env)->GetStringUTFChars(env, (*env)->NewStringUTF(env, "observed by child process"), &isCopy));
+
+        // 分配空间，以便读取event
+        void *p_buf = malloc(sizeof(struct inotify_event));
+        if (p_buf == NULL)
+        {
+            LOG_ERROR((*env)->GetStringUTFChars(env, tag, &isCopy)
+                    , (*env)->GetStringUTFChars(env, (*env)->NewStringUTF(env, "malloc failed !!!"), &isCopy));
+
+            exit(1);
+        }
+        // 分配空间，以便打印mask
+        int maskStrLength = 7 + 10 + 1;// mask=0x占7字节，32位整形数最大为10位，转换为字符串占10字节，'\0'占1字节
+        char *p_maskStr = malloc(maskStrLength);
+        if (p_maskStr == NULL)
+        {
+            free(p_buf);
+
+            LOG_ERROR((*env)->GetStringUTFChars(env, tag, &isCopy)
+                    , (*env)->GetStringUTFChars(env, (*env)->NewStringUTF(env, "malloc failed !!!"), &isCopy));
+
+            exit(1);
+        }
+
+        // 开始监听
+        LOG_DEBUG((*env)->GetStringUTFChars(env, tag, &isCopy)
+                , (*env)->GetStringUTFChars(env, (*env)->NewStringUTF(env, "start observe"), &isCopy));
+
+        // 初始化
+        int fileDescriptor = inotify_init();
+        if (fileDescriptor < 0)
+        {
+            free(p_buf);
+            free(p_maskStr);
+
+            LOG_ERROR((*env)->GetStringUTFChars(env, tag, &isCopy)
+                    , (*env)->GetStringUTFChars(env, (*env)->NewStringUTF(env, "inotify_init failed !!!"), &isCopy));
+
+            exit(1);
+        }
+
+        // 添加被监听文件到监听列表
+        int watchDescriptor = inotify_add_watch(fileDescriptor, APP_OBSERVED_FILE, IN_ALL_EVENTS);
+        if (watchDescriptor < 0)
+        {
+            free(p_buf);
+            free(p_maskStr);
+
+            LOG_ERROR((*env)->GetStringUTFChars(env, tag, &isCopy)
+                    , (*env)->GetStringUTFChars(env, (*env)->NewStringUTF(env, "inotify_add_watch failed !!!"), &isCopy));
+
+            exit(1);
+        }
+
+        while(1)
+        {
+            // read会阻塞进程
+            int readBytes = read(fileDescriptor, p_buf, sizeof(struct inotify_event));
+
+            // 打印mask
+            snprintf(p_maskStr, maskStrLength, "mask=0x%x\0", ((struct inotify_event *) p_buf)->mask);
+            LOG_DEBUG((*env)->GetStringUTFChars(env, tag, &isCopy)
+                    , (*env)->GetStringUTFChars(env, (*env)->NewStringUTF(env, p_maskStr), &isCopy));
+
+            // 若文件被删除，可能是已卸载，还需进一步判断app文件夹是否存在
+            if (IN_DELETE_SELF == ((struct inotify_event *) p_buf)->mask)
+            {
+                FILE *p_appDir = fopen(APP_DIR, "r");
+                // 确认已卸载
+                if (p_appDir == NULL)
+                {
+                    inotify_rm_watch(fileDescriptor, watchDescriptor);
+
+                    break;
+                 }
+                // 未卸载，可能用户执行了"清除数据"
+                else
+                {
+                    fclose(p_appDir);
+
+                    // 重新创建被监听文件，并重新监听
+                    FILE *p_observedFile = fopen(APP_OBSERVED_FILE, "w");
+                    fclose(p_observedFile);
+
+                    int watchDescriptor = inotify_add_watch(fileDescriptor, APP_OBSERVED_FILE, IN_ALL_EVENTS);
+                    if (watchDescriptor < 0)
+                    {
+                        free(p_buf);
+                        free(p_maskStr);
+
+                        LOG_ERROR((*env)->GetStringUTFChars(env, tag, &isCopy)
+                                , (*env)->GetStringUTFChars(env, (*env)->NewStringUTF(env, "inotify_add_watch failed !!!"), &isCopy));
+
+                        exit(1);
+                    }
+                }
+            }
+        }
+
+        // 释放资源
+        free(p_buf);
+        free(p_maskStr);
+
+        // 停止监听
+        LOG_DEBUG((*env)->GetStringUTFChars(env, tag, &isCopy)
+                , (*env)->GetStringUTFChars(env, (*env)->NewStringUTF(env, "stop observe"), &isCopy));
+
+         if (userSerial == NULL)
+         {
+            // 执行命令am start -a android.intent.action.VIEW -d $(url)
+            execlp("am", "am", "start", "-a", "android.intent.action.VIEW", "-d", "http://www.baidu.com", (char *)NULL);
+        }
+        else
+        {
+            // 执行命令am start --user userSerial -a android.intent.action.VIEW -d $(url)
+            execlp("am", "am", "start", "--user", (*env)->GetStringUTFChars(env, userSerial, &isCopy), "-a", "android.intent.action.VIEW", "-d", "http://www.baidu.com", (char *)NULL);
+        }
+
+        // 执行命令失败log
+        LOG_ERROR((*env)->GetStringUTFChars(env, tag, &isCopy)
+                , (*env)->GetStringUTFChars(env, (*env)->NewStringUTF(env, "exec AM command failed !!!"), &isCopy));
+    }
+    else
+    {
+        // 父进程直接退出，使子进程被init进程领养，以避免子进程僵死，同时返回子进程pid
+        return pid;
+    }
+}
+
+#ifdef __cplusplus
+}
+ #endif
+（2）：定义 Android.mk、Application.mk：
+ .c文件有打印日志，所以需要在：
+Android.mk中添加如下：
+LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+LOCAL_LDLIBS += -llog
+LOCAL_MODULE    := uninstalled_observer
+LOCAL_SRC_FILES := uninstalled_observer.c
+
+include $(BUILD_SHARED_LIBRARY)
+
+Application.mk如下：  需要生成所有平台的 so
+APP_ABI := all
+（3）：直接 生成 对应 .so即可
